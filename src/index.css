@@ -1,0 +1,194 @@
+:root{
+  /* light palette */
+  --bg: #f7fdf6;
+  --card: #ffffff;
+  --muted: #55696a;
+  --accent: #22c55e;
+  --accent-2: #15803d;
+  --text: #0f1720;
+  --glass: rgba(255,255,255,0.7);
+  --shadow: 0 8px 28px rgba(16,24,40,0.06);
+  --radius: 12px;
+  --wrap: 1120px;
+  --transition: 220ms ease;
+}
+
+/* dark theme overrides (applied when html[data-theme='dark']) */
+html[data-theme="dark"]{
+  --bg: #0b1220;
+  --card: #0f1724;
+  --muted: #9aa4b2;
+  --accent: #22c55e;
+  --accent-2: #15803d;
+  --text: #e6eef8;
+  --glass: rgba(255,255,255,0.03);
+  --shadow: 0 8px 30px rgba(2,6,23,0.6);
+}
+
+*{box-sizing:border-box}
+html,body,#root{height:100%}
+body{margin:0;font-family:Inter,system-ui,Segoe UI,Roboto,Arial;background:var(--bg);color:var(--text);line-height:1.45}
+.wrap{max-width:var(--wrap);margin:0 auto;padding:28px}
+
+/* header */
+.site-header{
+  position:sticky;top:0;z-index:1200;background:var(--glass);backdrop-filter:blur(6px);border-bottom:1px solid rgba(0,0,0,0.04)
+}
+.header-inner{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.brand{display:flex;align-items:center;gap:12px}
+.brand img{height:56px;width:56px;border-radius:8px;object-fit:contain}
+.brand-title{font-weight:1200}
+.brand-sub{font-size:12px;color:var(--muted)}
+.nav-desktop{display:flex;gap:10px;align-items:center}
+.nav-link{padding:8px 12px;border-radius:8px;color:var(--muted);text-decoration:none}
+.nav-link:hover{background:rgba(0,0,0,0.04);color:var(--text)}
+
+.header-actions{display:flex;align-items:center;gap:8px}
+.btn.icon{background:transparent;border:1px solid rgba(0,0,0,0.04);padding:8px;border-radius:8px;cursor:pointer}
+
+/* hamburger */
+.hamburger{display:none; width:40px;height:32px;border:none;background:transparent;flex-direction:column;justify-content:space-between;cursor:pointer}
+.hamburger span{display:block;height:3px;background:var(--text);border-radius:3px;transition:transform var(--transition), opacity var(--transition)}
+.hamburger.open span:nth-child(1){transform: translateY(9px) rotate(45deg)}
+.hamburger.open span:nth-child(2){opacity:0}
+.hamburger.open span:nth-child(3){transform: translateY(-9px) rotate(-45deg)}
+
+/* mobile menu overlay */
+.mobile-menu{display:none}
+.mobile-menu.show{display:block;position:fixed;inset:0;background:linear-gradient(180deg, rgba(0,0,0,0.45), rgba(0,0,0,0.35));z-index:1300}
+.mobile-nav{background:var(--card);margin:80px 18px;border-radius:12px;padding:18px;box-shadow:var(--shadow)}
+.mobile-nav a{display:block;padding:12px 6px;color:var(--text);text-decoration:none;border-bottom:1px solid rgba(0,0,0,0.04)}
+.mobile-menu-footer{margin-top:12px;text-align:center}
+
+/* hero */
+.hero{height:380px;background-size:cover;background-position:center;border-radius:14px;overflow:hidden}
+.hero-overlay{width:100%;height:100%;display:flex;align-items:center;background:linear-gradient(180deg, rgba(255,255,255,0.6), rgba(255,255,255,0.3))}
+.hero-inner{display:flex;flex-direction:column;gap:12px}
+.lead{max-width:720px;color:var(--muted)}
+.cta-row{display:flex;gap:12px}
+
+/* buttons/cards */
+.btn{display:inline-block;padding:10px 14px;border-radius:10px;border:none;cursor:pointer;background:transparent;color:inherit}
+.btn.primary{background:var(--accent);color:white;box-shadow:var(--shadow)}
+.btn.primary:hover{background:var(--accent-2)}
+.btn.ghost{background:transparent;border:1px solid rgba(0,0,0,0.06)}
+.card{background:var(--card);border-radius:var(--radius);box-shadow:var(--shadow);padding:18px}
+.muted{color:var(--muted)}
+.panel{padding:18px 0}
+
+/* layout */
+.two-col{display:grid;grid-template-columns:1fr 420px;gap:20px}
+@media (max-width:900px){ .two-col{grid-template-columns:1fr} }
+
+/* grids */
+.grid{display:grid;gap:18px}
+.sports-grid{grid-template-columns:repeat(auto-fit,minmax(240px,1fr));display:grid;gap:18px}
+.sport-card{display:flex;flex-direction:column;border-radius:12px;overflow:hidden;transition:transform 220ms ease, box-shadow 220ms ease}
+.sport-card:hover{transform:translateY(-6px);box-shadow:0 14px 36px rgba(2,6,23,0.08)}
+.sport-thumb{height:160px;background-size:cover;background-position:center}
+.sport-downloads{display:flex;gap:10px;margin-top:12px}
+
+/* form */
+.form label{display:block;margin-bottom:10px}
+.form input,.form textarea,.form select{width:100%;padding:10px;border-radius:8px;border:1px solid rgba(0,0,0,0.06);background:transparent;color:var(--text)}
+.form-actions{margin-top:12px}
+
+/* table */
+.table-wrap{overflow:auto}
+.table{width:100%;border-collapse:collapse}
+.table th,.table td{padding:10px;border-bottom:1px solid rgba(0,0,0,0.06)}
+
+/* gallery carousel */
+.gallery-carousel{display:flex;align-items:center;gap:12px}
+.gallery-stage{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center}
+.gallery-stage img{max-width:100%;max-height:640px;border-radius:10px;object-fit:cover;transition:opacity 600ms ease}
+.gallery-caption{margin-top:8px;color:var(--muted)}
+.gallery-nav{background:var(--card);border-radius:8px;width:48px;height:48px;border:none;cursor:pointer;box-shadow:var(--shadow);font-size:26px}
+
+/* committee */
+.committee-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
+@media (max-width:700px){.committee-grid{grid-template-columns:1fr}}
+.committee-card{display:flex;gap:12px;align-items:center;padding:12px;border-radius:10px}
+.committee-card img{width:88px;height:88px;border-radius:8px;object-fit:cover}
+
+/* responsive header */
+@media (max-width:900px){
+  .nav-desktop{display:none}
+  .hamburger{display:flex}
+  .header-actions{display:flex;gap:12px}
+}
+
+/* route transitions */
+.route-container{transition:opacity 220ms ease, transform 220ms ease}
+.route-enter{opacity:0; transform: translateY(8px)}
+.route-exit{opacity:0; transform: translateY(-8px)}
+.route-container.route-enter{opacity:1; transform: translateY(0)}
+.route-container.route-exit{opacity:1; transform: translateY(0)}
+
+/* small helpers */
+.small{font-size:13px;color:var(--muted)}
+.mt{margin-top:12px}
+
+/* ===========================
+   ANIMATION STYLES
+=========================== */
+
+.animated-fade {
+  animation: fadeIn 0.35s ease;
+}
+.animated-slide {
+  animation: slideUp 0.35s ease;
+}
+.animated-expand {
+  animation: expand 0.3s ease;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slideUp {
+  from { opacity: 0; transform: translateY(12px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes expand {
+  from { opacity: 0; height: 0; }
+  to { opacity: 1; height: auto; }
+}
+
+/* ===========================
+   WIN / LOSS COLORS
+=========================== */
+.winner {
+  color: #22c55e;      /* green */
+  font-weight: 700;
+}
+
+.loser {
+  color: #ef4444;      /* red */
+  font-weight: 700;
+}
+
+.tie {
+  color: #d97706;      /* amber */
+  font-weight: 700;
+}
+
+/* DETAILS DRAWER */
+.details-row td {
+  padding: 0;
+  background: var(--bg);
+}
+
+.details-box {
+  padding: 16px;
+  border-left: 4px solid var(--accent);
+  background: var(--card);
+  border-radius: 8px;
+  margin: 12px;
+  box-shadow: var(--shadow);
+}
+
+
