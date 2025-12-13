@@ -250,13 +250,13 @@ function Schedule() {
       <p className="muted">Download and view the official match schedule.</p>
 
       <div className="card">
-        <a className="btn primary" href="/assets/schedule.pdf" download>
+        <a className="btn primary" href="/assets/Schedule.pdf" download>
           Download Schedule
         </a>
 
         <div style={{ marginTop: 12 }}>
           <object
-            data="/assets/schedule.pdf"
+            data="/assets/Schedule.pdf"
             width="100%"
             height="640"
             type="application/pdf"
