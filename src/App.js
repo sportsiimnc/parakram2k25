@@ -4,7 +4,7 @@ import "./index.css";
 
 /* ---------- CONFIG ---------- */
 const WEBAPP_URL =
-  "https://script.google.com/macros/s/AKfycbyyt1njmo0R0hXEtMv0adsnyxC963mF9FZwtOFcCrDRbQRRHIud9SSQsMdYwZNv-qqx/exec";
+  "https://script.google.com/macros/s/AKfycbwy0f2FLYxdPLQzwkNT_qGUEJ7IAKGtqPEhKK-jkhy3WLawIaCSRhTYBOJn2Fa6TDTz/exec";
 /* ----------------------------- */
 
 
@@ -188,7 +188,7 @@ function NavLink({ to, children }) {
 function Footer() {
   return (
     <footer className="site-footer">
-      <div className="wrap small">© Parakram 2026 · Sports committee-IIM Lucknow NC</div>
+      <div className="wrap small">© Parakram 2026 · Sports committee-IIM Lucknow NC </div>
     </footer>
   );
 }
@@ -200,7 +200,10 @@ function Home() {
       <div className="hero-overlay">
         <div className="wrap hero-inner">
           <h1 className="funky-title">PARAKRAM 2026</h1>
-          <p className="lead">A festival of sports, grit and glorious competition — see you on the field.A festival of sports, grit and glorious competition — see you on the field.A festival of sports, grit and glorious competition — see you on the field.A festival of sports, grit and glorious competition — see you on the field.</p>
+          <p className="lead">Built on grit. Driven by passion. Defined by excellence.
+Every contest demands heart, hustle, and resilience.
+Win with pride. Compete with purpose.
+The game begins here.</p>
           <div className="cta-row">
             <Link to="/register" className="btn primary">Register</Link>
             <Link to="/schedule" className="btn ghost">View Schedule</Link>
@@ -247,7 +250,7 @@ function Schedule() {
   return (
     <section className="wrap panel">
       <h2>Schedule</h2>
-      <p className="muted">Download and view the official match schedule.</p>
+      <p className="muted">Download and view the latest official upadtes</p>
 
       <div className="card">
         <a className="btn primary" href="/assets/Schedule.pdf" download>
@@ -323,24 +326,21 @@ function Standings() {
       setResults(filteredResults);
 
       /* STANDINGS */
-const grouped = {};
-SPORTS.forEach(s => (grouped[s] = []));
+      const grouped = {};
+      SPORTS.forEach(s => (grouped[s] = []));
 
-// If standings are NOT sport-wise, just show same table for all sports
-(data.standings || []).forEach(row => {
-  SPORTS.forEach(sport => {
-    grouped[sport].push({
-      Team: row.Team,
-      Played: Number(row.P || 0),
-      Won: Number(row.W || 0),
-      Lost: Number(row.L || 0),
-      Points: Number(row.Pts || 0)
-    });
-  });
-});
-
-setTeamsBySport(grouped);
-
+      (data.standings || []).forEach(row => {
+        SPORTS.forEach(sport => {
+          grouped[sport].push({
+            Team: row.Team,
+            Played: Number(row.P || 0),
+            Won: Number(row.W || 0),
+            Lost: Number(row.L || 0),
+            Points: Number(row.Pts || 0)
+          });
+        });
+      });
+      setTeamsBySport(grouped);
 
       /* MEDALS */
       const medalSafe = {};
@@ -355,9 +355,9 @@ setTeamsBySport(grouped);
 
       setLastUpdated(new Date());
       setStatus("Live data from Google Sheets");
-    } catch (err) {
-      console.error(err);
-      setStatus("Failed to load live data");
+    } catch (e) {
+      console.error(e);
+      setStatus("Failed to load data");
     } finally {
       setLoading(false);
     }
@@ -371,23 +371,25 @@ setTeamsBySport(grouped);
 
   /* MEDAL SORTING */
   const overall = Object.entries(medals)
-  .map(([team, m]) => ({
-    team,
-    gold: m.gold,
-    silver: m.silver,
-    bronze: m.bronze,
-    total: m.gold + m.silver + m.bronze
-  }))
-  .sort((a, b) => b.total - a.total);
+    .map(([team, m]) => ({
+      team,
+      gold: m.gold,
+      silver: m.silver,
+      bronze: m.bronze,
+      total: m.gold + m.silver + m.bronze
+    }))
+    .sort((a, b) =>
+      medalSortBy === "gold"
+        ? b.gold - a.gold || b.total - a.total
+        : b.total - a.total || b.gold - a.gold
+    );
 
   return (
     <section className="wrap panel">
       <div style={{ display: "flex", justifyContent: "space-between" }}>
         <h2>
           Standings & Results
-          <span style={{ marginLeft: 10, color: "#ef4444", fontWeight: 700 }}>
-            ● LIVE
-          </span>
+          <span style={{ marginLeft: 10, color: "#ef4444", fontWeight: 700 }}>● LIVE</span>
         </h2>
         <button className="btn ghost" onClick={loadData}>Refresh</button>
       </div>
@@ -400,24 +402,46 @@ setTeamsBySport(grouped);
         {SPORTS.map(s => <option key={s}>{s}</option>)}
       </select>
 
-      {/* MATCH RESULTS – CARD VIEW */}
+      {/* MATCH RESULTS */}
       <div className="card mt">
         <h3>Match Results</h3>
-        {loading ? "Loading…" : results.length === 0 ? (
+
+        {loading ? (
+          "Loading…"
+        ) : results.length === 0 ? (
           <p className="muted">No results yet.</p>
         ) : (
           results.map((r, i) => (
             <div key={i} className="card mt">
-              <div style={{ display: "flex", justifyContent: "space-between" }}>
-                <strong>{r.TeamA}</strong>
-                <strong>{r.ScoreA} - {r.ScoreB}</strong>
-                <strong>{r.TeamB}</strong>
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                <strong className={r.Winner === r.TeamA ? "winner" : ""}>
+                  {r.TeamA}
+                </strong>
+
+                <strong>
+                  {r.ScoreA} - {r.ScoreB}
+                </strong>
+
+                <strong className={r.Winner === r.TeamB ? "winner" : ""}>
+                  {r.TeamB}
+                </strong>
               </div>
-              <div className="small muted">
-                Status: <span className={`status ${r.Status?.toLowerCase() || "final"}`}>
-                  {r.Status || "FINAL"}
-                </span>
+
+              <div className="small muted" style={{ marginTop: 6 }}>
+                {r.Status === "LIVE" && (
+                  <span className="live-badge">● LIVE</span>
+                )}
+                {r.Winner && r.Winner !== "DRAW" && r.Status !== "LIVE" && (
+                  <span>
+                    Winner: <strong>{r.Winner}</strong>
+                  </span>
+                )}
+                {r.Winner === "DRAW" && <span>Match Drawn</span>}
               </div>
+
+              {r.Date && (
+                <div className="small muted">📅 {r.Date}</div>
+              )}
             </div>
           ))
         )}
@@ -429,32 +453,74 @@ setTeamsBySport(grouped);
         <table className="table">
           <thead>
             <tr>
-              <th>#</th><th>Team</th><th>P</th><th>W</th><th>L</th><th>Pts</th>
+              <th style={{ width: "6%", textAlign: "center" }}>#</th>
+              <th style={{ width: "34%", textAlign: "left" }}>Team</th>
+              <th style={{ textAlign: "center" }}>P</th>
+              <th style={{ textAlign: "center" }}>W</th>
+              <th style={{ textAlign: "center" }}>L</th>
+              <th style={{ textAlign: "center" }}>Pts</th>
             </tr>
           </thead>
           <tbody>
             {(teamsBySport[selectedSport] || []).map((t, i) => (
-              <tr key={i} style={i === 0 ? { background: "rgba(34,197,94,0.1)", fontWeight: 700 } : {}}>
-                <td>{i + 1}</td>
-                <td>{t.Team}</td>
-                <td>{t.Played}</td>
-                <td>{t.Won}</td>
-                <td>{t.Lost}</td>
-                <td>{t.Points}</td>
+              <tr key={i} style={i === 0 ? { background: "rgba(34,197,94,0.12)", fontWeight: 700 } : {}}>
+                <td style={{ textAlign: "center" }}>{i + 1}</td>
+                <td style={{ textAlign: "left" }}>{t.Team}</td>
+                <td style={{ textAlign: "center" }}>{t.Played}</td>
+                <td style={{ textAlign: "center" }}>{t.Won}</td>
+                <td style={{ textAlign: "center" }}>{t.Lost}</td>
+                <td style={{ textAlign: "center" }}>{t.Points}</td>
               </tr>
             ))}
           </tbody>
         </table>
       </div>
 
-      {/* MEDALS – PODIUM */}
+      {/* MEDALS */}
       <div className="card mt">
-        <h3>Top 3 Medals</h3>
-        {overall.slice(0, 3).map((o, i) => (
-          <div key={o.team} style={{ fontWeight: 700 }}>
-            {i === 0 && "🥇"} {i === 1 && "🥈"} {i === 2 && "🥉"} {o.team} — {o.total}
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+          <h3>Overall Medals</h3>
+          <div>
+            <button
+              className={`btn ghost ${medalSortBy === "gold" ? "primary" : ""}`}
+              onClick={() => setMedalSortBy("gold")}
+            >
+              Sort by Gold
+            </button>
+            <button
+              className={`btn ghost ${medalSortBy === "total" ? "primary" : ""}`}
+              onClick={() => setMedalSortBy("total")}
+              style={{ marginLeft: 8 }}
+            >
+              Sort by Total
+            </button>
           </div>
-        ))}
+        </div>
+
+        <table className="table mt">
+          <thead>
+            <tr>
+              <th style={{ width: "6%", textAlign: "center" }}>#</th>
+              <th style={{ width: "34%", textAlign: "left" }}>Team</th>
+              <th style={{ textAlign: "center" }}>🥇</th>
+              <th style={{ textAlign: "center" }}>🥈</th>
+              <th style={{ textAlign: "center" }}>🥉</th>
+              <th style={{ textAlign: "center" }}>Total</th>
+            </tr>
+          </thead>
+          <tbody>
+            {overall.map((o, i) => (
+              <tr key={o.team} style={i < 3 ? { fontWeight: 700 } : {}}>
+                <td style={{ textAlign: "center" }}>{i + 1}</td>
+                <td style={{ textAlign: "left" }}>{o.team}</td>
+                <td style={{ textAlign: "center" }}>{o.gold}</td>
+                <td style={{ textAlign: "center" }}>{o.silver}</td>
+                <td style={{ textAlign: "center" }}>{o.bronze}</td>
+                <td style={{ textAlign: "center" }}>{o.total}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
       </div>
 
       <div className="small muted mt">
@@ -463,7 +529,6 @@ setTeamsBySport(grouped);
     </section>
   );
 }
-
 
 
 

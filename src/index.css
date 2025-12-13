@@ -256,4 +256,35 @@ html[data-theme="dark"] .hero-inner .lead {
     font-size: 1.05rem;
   }
 }
+.table th,
+.table td {
+  vertical-align: middle;
+}
+
+.table th.center,
+.table td.center {
+  text-align: center;
+}
+
+.table th.left,
+.table td.left {
+  text-align: left;
+}
+.winner {
+  color: #16a34a;
+  font-weight: 800;
+}
+
+.live-badge {
+  color: #ef4444;
+  font-weight: 800;
+  margin-right: 10px;
+  animation: blink 1s infinite;
+}
+
+@keyframes blink {
+  0%   { opacity: 1; }
+  50%  { opacity: 0.3; }
+  100% { opacity: 1; }
+}
 
