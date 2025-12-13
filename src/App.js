@@ -1,13 +1,13 @@
-// src/App.js
-import React, { useEffect, useState, useRef } from "react";
+import React, { useEffect, useState, useRef, useCallback } from "react";
 import { BrowserRouter as Router, Routes, Route, Link, useLocation } from "react-router-dom";
 import "./index.css";
 
 /* ---------- CONFIG ---------- */
 const WEBAPP_URL =
-  "https://script.google.com/macros/s/AKfycbwAuHIm4ZADCWfq0NVm8_EHUl4wILFfXHMycZ_qxuxi7dj43M6IeuevqJQO88YLyRo0/exec";
-const WEBAPP_SECRET = "IIMLUCKNOWNOIDACAMPUS";
+  "https://script.google.com/macros/s/AKfycbz1bL5cArhzVlcTLQyeVic9EIHhWCvy7EVOtwIy9wnz_gXFbUvrWEFoBFFHKczNgl6V/exec";
 /* ----------------------------- */
+
+
 
 /* ---------- ASSETS / DATA ---------- */
 const LOGO_PATH = "/assets/Parakram_Logo.png";
@@ -135,7 +135,7 @@ function Header({ theme, setTheme }) {
         <Link to="/" className="brand">
           <img src={LOGO_PATH} alt="logo" onError={(e) => (e.target.src = PLACEHOLDER_SVG)} />
           <div className="brand-text">
-            <div className="brand-title">Parakram 2025</div>
+            <div className="brand-title">Parakram 2026</div>
             <div className="brand-sub">Annual Sports Festival</div>
           </div>
         </Link>
@@ -188,7 +188,7 @@ function NavLink({ to, children }) {
 function Footer() {
   return (
     <footer className="site-footer">
-      <div className="wrap small">© Parakram 2025 · Sports committee-IIM Lucknow NC</div>
+      <div className="wrap small">© Parakram 2026 · Sports committee-IIM Lucknow NC</div>
     </footer>
   );
 }
@@ -199,7 +199,7 @@ function Home() {
     <section className="hero" style={{ backgroundImage: `url(${HERO_IMG})` }}>
       <div className="hero-overlay">
         <div className="wrap hero-inner">
-          <h1 className="funky-title">PARAKRAM 2025</h1>
+          <h1 className="funky-title">PARAKRAM 2026</h1>
           <p className="lead">A festival of sports, grit and glorious competition — see you on the field.</p>
           <div className="cta-row">
             <Link to="/register" className="btn primary">Register</Link>
@@ -217,7 +217,7 @@ function Sports() {
   return (
     <section className="wrap panel">
       <h2>Sports Lineup</h2>
-      <p className="muted">Download Rules & Fixtures for each sport.</p>
+      <p className="muted"> Rules & Fixtures for each sport</p>
       <div className="grid sports-grid">
         {SPORTS.map((s, i) => {
           const base = fileName(s);
@@ -244,63 +244,11 @@ function Sports() {
 
 
 function Schedule() {
-  const [sport, setSport] = useState(SPORTS[0]);
-  const [results, setResults] = useState([]);
-  const [loading, setLoading] = useState(false);
-  const [openIndex, setOpenIndex] = useState(null); 
-  const [refreshTime, setRefreshTime] = useState("");
-
-  async function loadResults(selectedSport) {
-    setLoading(true);
-    try {
-      const res = await fetch(WEBAPP_URL);
-      const data = await res.json();
-
-      const filtered = (data.results || []).filter(
-        (r) => r.Sport === selectedSport
-      );
-
-      setResults(filtered);
-
-      const now = new Date();
-      setRefreshTime(now.toLocaleTimeString());
-    } catch (err) {
-      setResults([]);
-    }
-    setLoading(false);
-  }
-
-  // Load on sport change
-  useEffect(() => {
-    loadResults(sport);
-  }, [sport]);
-
-  // Auto refresh every 30 minutes
-  useEffect(() => {
-    const id = setInterval(() => loadResults(sport), 1800000);
-    return () => clearInterval(id);
-  }, [sport]);
-
-
-  /* ------- HELPERS -------- */
-
-  function getWinnerClass(a, b) {
-    if (a > b) return "winner";
-    if (b > a) return "loser";
-    return "tie";
-  }
-
-  function toggleDetails(i) {
-    setOpenIndex(openIndex === i ? null : i);
-  }
-
-
   return (
     <section className="wrap panel">
       <h2>Schedule</h2>
-      <p className="muted">Download, preview and check match results.</p>
+      <p className="muted">Download and view the official match schedule.</p>
 
-      {/* -------- DOWNLOAD CARD -------- */}
       <div className="card">
         <a className="btn primary" href="/assets/schedule.pdf" download>
           Download Schedule
@@ -317,98 +265,9 @@ function Schedule() {
           </object>
         </div>
       </div>
-
-      {/* -------- RESULTS SECTION -------- */}
-      <div className="card mt">
-        <h3>Match Results (Live)</h3>
-        <p className="small muted">
-          Last refreshed at: <b>{refreshTime || "—"}</b>
-        </p>
-
-        <label className="muted small">Select Sport</label>
-        <select
-          className="sport-select"
-          value={sport}
-          onChange={(e) => setSport(e.target.value)}
-        >
-          {SPORTS.map((s) => (
-            <option key={s}>{s}</option>
-          ))}
-        </select>
-
-        {/* ANIMATED SCOREBOARD */}
-        <div className="results-wrapper animated-fade mt">
-          {loading ? (
-            <p className="muted">Loading results…</p>
-          ) : results.length === 0 ? (
-            <p className="muted">No results uploaded yet for this sport.</p>
-          ) : (
-            <table className="table animated-slide">
-              <thead>
-                <tr>
-                  <th>Team A</th>
-                  <th>Score</th>
-                  <th>Team B</th>
-                  <th>Details</th>
-                </tr>
-              </thead>
-
-              <tbody>
-                {results.map((r, i) => (
-                  <>
-                    <tr key={i}>
-                      <td className={getWinnerClass(r.ScoreA, r.ScoreB)}>
-                        {r.TeamA}
-                      </td>
-
-                      <td>
-                        <span className={getWinnerClass(r.ScoreA, r.ScoreB)}>
-                          {r.ScoreA}
-                        </span>
-                        {" - "}
-                        <span className={getWinnerClass(r.ScoreB, r.ScoreA)}>
-                          {r.ScoreB}
-                        </span>
-                      </td>
-
-                      <td className={getWinnerClass(r.ScoreB, r.ScoreA)}>
-                        {r.TeamB}
-                      </td>
-
-                      <td>
-                        <button
-                          className="btn ghost small"
-                          onClick={() => toggleDetails(i)}
-                        >
-                          {openIndex === i ? "Hide" : "View"}
-                        </button>
-                      </td>
-                    </tr>
-
-                    {/* DETAILS DRAWER */}
-                    {openIndex === i && (
-                      <tr className="details-row animated-expand">
-                        <td colSpan={4}>
-                          <div className="details-box">
-                            <p><b>Match Time:</b> {r.Time || "Not provided"}</p>
-                            <p><b>Venue:</b> {r.Venue || "Not provided"}</p>
-                            <p><b>Referee:</b> {r.Referee || "Not provided"}</p>
-                            <p><b>Notes:</b> {r.Notes || "No additional details"}</p>
-                          </div>
-                        </td>
-                      </tr>
-                    )}
-                  </>
-                ))}
-              </tbody>
-            </table>
-          )}
-        </div>
-      </div>
     </section>
   );
 }
-
 
 
 function Register() {
@@ -436,87 +295,194 @@ function Register() {
   );
 }
 
-/* Standings (read-only) */
+
+
+
 function Standings() {
-  const [teams, setTeams] = useState(Object.fromEntries(SPORTS.map((s) => [s, []])));
+  const [selectedSport, setSelectedSport] = useState(SPORTS[0]);
+  const [results, setResults] = useState([]);
+  const [teamsBySport, setTeamsBySport] = useState({});
   const [medals, setMedals] = useState({});
-  const [selected, setSelected] = useState(SPORTS[0]);
+  const [medalSortBy, setMedalSortBy] = useState("gold");
   const [loading, setLoading] = useState(true);
   const [status, setStatus] = useState("");
 
-  useEffect(() => {
-    let mounted = true;
-    async function load() {
-      try {
-        setLoading(true);
-        const res = await fetch(WEBAPP_URL);
-        if (!res.ok) throw new Error("Network");
-        const data = await res.json();
-        const bySport = {}; SPORTS.forEach((s) => (bySport[s] = []));
-        (data.standings || []).forEach((row) => {
-          const sport = row.Sport || row.sport || "Unknown";
-          if (!bySport[sport]) bySport[sport] = [];
-          bySport[sport].push({
-            team: row.Team || row.team || "",
-            played: row.Played || row.played || 0,
-            won: row.Won || row.won || 0,
-            lost: row.Lost || row.lost || 0,
-            points: row.Points || row.points || 0,
-          });
-        });
-        if (mounted) {
-          setTeams(bySport);
-          setMedals(data.medals || {});
-          setStatus("Loaded from sheet.");
-        }
-      } catch (err) {
-        if (mounted) {
-          setStatus("Failed to load standings.");
-          setTeams(Object.fromEntries(SPORTS.map((s) => [s, []])));
-          setMedals({});
-        }
-      } finally {
-        if (mounted) setLoading(false);
-      }
-    }
-    load();
-    const id = setInterval(load, 3000); // 5 minutes
-    return () => { mounted = false; clearInterval(id); };
-  }, []);
+  const normalizeSport = (s) =>
+    String(s || "").trim().toLowerCase();
 
+  const loadData = useCallback(async () => {
+  try {
+    setLoading(true);
+    const res = await fetch(WEBAPP_URL);
+    const data = await res.json();
+
+    /* ---------- RESULTS ---------- */
+    const filteredResults = (data.results || []).filter(r =>
+      normalizeSport(r.Sport) === normalizeSport(selectedSport)
+    );
+    setResults(filteredResults);
+
+    /* ---------- STANDINGS ---------- */
+    const grouped = {};
+    SPORTS.forEach(s => (grouped[s] = []));
+
+    (data.standings || []).forEach(row => {
+      const sportKey = SPORTS.find(
+        s => normalizeSport(s) === normalizeSport(row.Sport)
+      );
+      if (!sportKey) return;
+
+      grouped[sportKey].push({
+        Team: row.Team,
+        Played: Number(row.Played || 0),
+        Won: Number(row.Won || 0),
+        Lost: Number(row.Lost || 0),
+        Points: Number(row.Points || 0)
+      });
+    });
+    setTeamsBySport(grouped);
+
+    /* ---------- MEDALS ---------- */
+    const medalSafe = {};
+    Object.entries(data.medals || {}).forEach(([team, m]) => {
+      medalSafe[team] = {
+        gold: Number(m.gold ?? m.Gold ?? 0),
+        silver: Number(m.silver ?? m.Silver ?? 0),
+        bronze: Number(m.bronze ?? m.Bronze ?? 0)
+      };
+    });
+    setMedals(medalSafe);
+
+    setStatus("Live data from Google Sheets");
+  } catch (err) {
+    console.error(err);
+    setStatus("Failed to load live data");
+  } finally {
+    setLoading(false);
+  }
+}, [selectedSport]);
+
+
+  /* Fetch once per minute */
+  useEffect(() => {
+  loadData();
+  const id = setInterval(loadData, 60000);
+  return () => clearInterval(id);
+}, [loadData]);
+
+
+  /* ---------- SORTED MEDAL TABLE ---------- */
   const overall = Object.entries(medals)
-    .map(([team, m]) => ({ team, gold: m?.gold || 0, silver: m?.silver || 0, bronze: m?.bronze || 0, total: (m?.gold||0)+(m?.silver||0)+(m?.bronze||0) }))
-    .sort((a,b) => b.gold - a.gold || b.total - a.total);
+    .map(([team, m]) => ({
+      team,
+      gold: m.gold,
+      silver: m.silver,
+      bronze: m.bronze,
+      total: m.gold + m.silver + m.bronze
+    }))
+    .sort((a, b) => {
+      if (medalSortBy === "gold")
+        return b.gold - a.gold || b.silver - a.silver || b.bronze - a.bronze;
+      if (medalSortBy === "silver")
+        return b.silver - a.silver || b.gold - a.gold || b.bronze - a.bronze;
+      if (medalSortBy === "bronze")
+        return b.bronze - a.bronze || b.gold - a.gold || b.silver - a.silver;
+      return b.total - a.total;
+    });
 
   return (
     <section className="wrap panel">
-      <h2>Standings (Live)</h2>
-      <p className="muted">Read-only standings — update via Google Sheets.</p>
-      <select className="sport-select" value={selected} onChange={(e)=>setSelected(e.target.value)}>
-        {SPORTS.map(s => <option key={s} value={s}>{s}</option>)}
+      <h2>Standings & Results (Live)</h2>
+
+      <select
+        className="sport-select"
+        value={selectedSport}
+        onChange={(e) => setSelectedSport(e.target.value)}
+      >
+        {SPORTS.map(s => <option key={s}>{s}</option>)}
       </select>
 
-      <div className="card table-wrap mt">
-        {loading ? "Loading…" : (
+      {/* ---------- RESULTS ---------- */}
+      <div className="card mt">
+        <h3>Match Results</h3>
+        {loading ? "Loading…" : results.length === 0 ? (
+          <p className="muted">No results uploaded yet.</p>
+        ) : (
           <table className="table">
-            <thead><tr><th>Team</th><th>Played</th><th>Won</th><th>Lost</th><th>Points</th></tr></thead>
+            <thead>
+              <tr><th>Team A</th><th>Score</th><th>Team B</th></tr>
+            </thead>
             <tbody>
-              {(teams[selected]||[]).length ? (teams[selected]||[]).map((t,i)=>(
-                <tr key={i}><td>{t.team}</td><td>{t.played}</td><td>{t.won}</td><td>{t.lost}</td><td>{t.points}</td></tr>
-              )) : <tr><td colSpan={5}>No data yet for {selected}.</td></tr>}
+              {results.map((r, i) => (
+                <tr key={i}>
+                  <td className={r.ScoreA > r.ScoreB ? "winner" : "loser"}>{r.TeamA}</td>
+                  <td>{r.ScoreA} - {r.ScoreB}</td>
+                  <td className={r.ScoreB > r.ScoreA ? "winner" : "loser"}>{r.TeamB}</td>
+                </tr>
+              ))}
             </tbody>
           </table>
         )}
       </div>
 
+      {/* ---------- STANDINGS ---------- */}
       <div className="card mt">
-        <h3>Overall Medals</h3>
+        <h3>Standings</h3>
         <table className="table">
-          <thead><tr><th>Team</th><th>Gold</th><th>Silver</th><th>Bronze</th><th>Total</th></tr></thead>
+          <thead>
+            <tr><th>Team</th><th>Played</th><th>Won</th><th>Lost</th><th>Points</th></tr>
+          </thead>
           <tbody>
-            {overall.length ? overall.map(o=>(
-              <tr key={o.team}><td>{o.team}</td><td>{o.gold}</td><td>{o.silver}</td><td>{o.bronze}</td><td>{o.total}</td></tr>
-            )) : <tr><td colSpan={5}>No medals recorded yet.</td></tr>}
+            {(teamsBySport[selectedSport] || []).length ? (
+              teamsBySport[selectedSport].map((t, i) => (
+                <tr key={i}>
+                  <td>{t.Team}</td>
+                  <td>{t.Played}</td>
+                  <td>{t.Won}</td>
+                  <td>{t.Lost}</td>
+                  <td>{t.Points}</td>
+                </tr>
+              ))
+            ) : (
+              <tr><td colSpan={5}>No data for this sport.</td></tr>
+            )}
+          </tbody>
+        </table>
+      </div>
+
+      {/* ---------- MEDALS ---------- */}
+      <div className="card mt">
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+          <h3>Overall Medals</h3>
+          <select
+            className="sport-select"
+            value={medalSortBy}
+            onChange={(e) => setMedalSortBy(e.target.value)}
+            style={{ maxWidth: 180 }}
+          >
+            <option value="gold">Sort by Gold 🥇</option>
+            <option value="silver">Sort by Silver 🥈</option>
+            <option value="bronze">Sort by Bronze 🥉</option>
+            <option value="total">Sort by Total 🧮</option>
+          </select>
+        </div>
+
+        <table className="table">
+          <thead>
+            <tr><th>Team</th><th>Gold</th><th>Silver</th><th>Bronze</th><th>Total</th></tr>
+          </thead>
+          <tbody>
+            {overall.length ? overall.map(o => (
+              <tr key={o.team}>
+                <td>{o.team}</td>
+                <td>{o.gold}</td>
+                <td>{o.silver}</td>
+                <td>{o.bronze}</td>
+                <td>{o.total}</td>
+              </tr>
+            )) : (
+              <tr><td colSpan={5}>No medals recorded yet.</td></tr>
+            )}
           </tbody>
         </table>
       </div>
@@ -525,6 +491,9 @@ function Standings() {
     </section>
   );
 }
+
+
+
 
 /* Gallery: carousel with 20 images */
 
@@ -557,7 +526,7 @@ function Gallery() {
   );
 }
 
-/* Contact: 6 committee members and form sends to xyz@gmail.com */
+/* Contact: 6 committee members */
 function Contact() {
   const committee = [
     { name: "Ayush Kanojiya", role: "Sports Committee", phone: "+91-98765-43210", photo: COMMITTEE_IMAGES[0] },
