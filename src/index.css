@@ -1,3 +1,6 @@
+@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600;700&display=swap');
+
+  
 :root{
   /* light palette */
   --bg: #f7fdf6;
@@ -191,4 +194,66 @@ body{margin:0;font-family:Inter,system-ui,Segoe UI,Roboto,Arial;background:var(-
   box-shadow: var(--shadow);
 }
 
+/* ===========================
+   HERO CENTER TEXT FIX ONLY
+=========================== */
+
+/* Main title: PARAKRAM 2026 */
+.hero-inner h1 {
+   font-family: 'Cinzel', serif;
+  font-size: 4.1rem;
+  font-weight: 700;
+  letter-spacing: 4px;
+  text-transform: uppercase;
+
+  margin-bottom: 6px;
+  line-height: 1.05;
+
+  color: #0f1720;
+
+  /* Shadow for image readability */
+  text-shadow:
+    0 2px 6px rgba(255, 255, 255, 0.65),
+    0 6px 18px rgba(0, 0, 0, 0.15);
+}
+
+/* Subtitle text */
+.hero-inner .lead {
+  font-family: 'Cinzel', serif;
+  font-size: 1.25rem;
+  font-weight: 400;
+  line-height: 1.6;
+  max-width: 760px;
+
+  color: #202d3a;
+
+  text-shadow:
+    0 1px 4px rgba(255, 255, 255, 0.6);
+}
+
+/* Dark mode refinement */
+html[data-theme="dark"] .hero-inner h1 {
+  color: #586e9d;
+  text-shadow:
+    0 2px 8px rgba(0, 0, 0, 0.8);
+}
+
+html[data-theme="dark"] .hero-inner .lead {
+  color:  #586e9d;
+;
+  text-shadow:
+    0 2px 6px rgba(0, 0, 0, 0.75);
+}
+
+/* Mobile scaling */
+@media (max-width: 768px) {
+  .hero-inner h1 {
+    font-size: 2.6rem;
+    letter-spacing: 2px;
+  }
+
+  .hero-inner .lead {
+    font-size: 1.05rem;
+  }
+}
 

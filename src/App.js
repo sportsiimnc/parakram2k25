@@ -4,14 +4,14 @@ import "./index.css";
 
 /* ---------- CONFIG ---------- */
 const WEBAPP_URL =
-  "https://script.google.com/macros/s/AKfycbz1bL5cArhzVlcTLQyeVic9EIHhWCvy7EVOtwIy9wnz_gXFbUvrWEFoBFFHKczNgl6V/exec";
+  "https://script.google.com/macros/s/AKfycbyyt1njmo0R0hXEtMv0adsnyxC963mF9FZwtOFcCrDRbQRRHIud9SSQsMdYwZNv-qqx/exec";
 /* ----------------------------- */
 
 
 
-/* ---------- ASSETS / DATA ---------- */
+/* ---------- ASSETS ---------- */
 const LOGO_PATH = "/assets/Parakram_Logo.png";
-const HERO_IMG = "/assets/home-bg.jpg";
+const HERO_IMG = "/assets/home-bg.png";
 
 const SPORT_IMAGES = [
   "/assets/sports-cricket.jpg",
@@ -118,7 +118,7 @@ export default function App() {
   );
 }
 
-/* -------- Header / Mobile menu / Theme toggle -------- */
+/* -------- Header / Mobile menu -------- */
 function Header({ theme, setTheme }) {
   const [open, setOpen] = useState(false); // mobile menu
   useEffect(() => {
@@ -136,7 +136,7 @@ function Header({ theme, setTheme }) {
           <img src={LOGO_PATH} alt="logo" onError={(e) => (e.target.src = PLACEHOLDER_SVG)} />
           <div className="brand-text">
             <div className="brand-title">Parakram 2026</div>
-            <div className="brand-sub">Annual Sports Festival</div>
+            <div className="brand-sub">Annual Sports Festival of IIML-NC</div>
           </div>
         </Link>
 
@@ -200,7 +200,7 @@ function Home() {
       <div className="hero-overlay">
         <div className="wrap hero-inner">
           <h1 className="funky-title">PARAKRAM 2026</h1>
-          <p className="lead">A festival of sports, grit and glorious competition — see you on the field.</p>
+          <p className="lead">A festival of sports, grit and glorious competition — see you on the field.A festival of sports, grit and glorious competition — see you on the field.A festival of sports, grit and glorious competition — see you on the field.A festival of sports, grit and glorious competition — see you on the field.</p>
           <div className="cta-row">
             <Link to="/register" className="btn primary">Register</Link>
             <Link to="/schedule" className="btn ghost">View Schedule</Link>
@@ -306,93 +306,91 @@ function Standings() {
   const [medalSortBy, setMedalSortBy] = useState("gold");
   const [loading, setLoading] = useState(true);
   const [status, setStatus] = useState("");
+  const [lastUpdated, setLastUpdated] = useState(null);
 
-  const normalizeSport = (s) =>
-    String(s || "").trim().toLowerCase();
+  const normalizeSport = (s) => String(s || "").trim().toLowerCase();
 
   const loadData = useCallback(async () => {
-  try {
-    setLoading(true);
-    const res = await fetch(WEBAPP_URL);
-    const data = await res.json();
+    try {
+      setLoading(true);
+      const res = await fetch(WEBAPP_URL);
+      const data = await res.json();
 
-    /* ---------- RESULTS ---------- */
-    const filteredResults = (data.results || []).filter(r =>
-      normalizeSport(r.Sport) === normalizeSport(selectedSport)
-    );
-    setResults(filteredResults);
-
-    /* ---------- STANDINGS ---------- */
-    const grouped = {};
-    SPORTS.forEach(s => (grouped[s] = []));
-
-    (data.standings || []).forEach(row => {
-      const sportKey = SPORTS.find(
-        s => normalizeSport(s) === normalizeSport(row.Sport)
+      /* RESULTS */
+      const filteredResults = (data.results || []).filter(
+        r => normalizeSport(r.Sport) === normalizeSport(selectedSport)
       );
-      if (!sportKey) return;
+      setResults(filteredResults);
 
-      grouped[sportKey].push({
-        Team: row.Team,
-        Played: Number(row.Played || 0),
-        Won: Number(row.Won || 0),
-        Lost: Number(row.Lost || 0),
-        Points: Number(row.Points || 0)
+      /* STANDINGS */
+const grouped = {};
+SPORTS.forEach(s => (grouped[s] = []));
+
+// If standings are NOT sport-wise, just show same table for all sports
+(data.standings || []).forEach(row => {
+  SPORTS.forEach(sport => {
+    grouped[sport].push({
+      Team: row.Team,
+      Played: Number(row.P || 0),
+      Won: Number(row.W || 0),
+      Lost: Number(row.L || 0),
+      Points: Number(row.Pts || 0)
+    });
+  });
+});
+
+setTeamsBySport(grouped);
+
+
+      /* MEDALS */
+      const medalSafe = {};
+      Object.entries(data.medals || {}).forEach(([team, m]) => {
+        medalSafe[team] = {
+          gold: Number(m.gold ?? m.Gold ?? 0),
+          silver: Number(m.silver ?? m.Silver ?? 0),
+          bronze: Number(m.bronze ?? m.Bronze ?? 0)
+        };
       });
-    });
-    setTeamsBySport(grouped);
+      setMedals(medalSafe);
 
-    /* ---------- MEDALS ---------- */
-    const medalSafe = {};
-    Object.entries(data.medals || {}).forEach(([team, m]) => {
-      medalSafe[team] = {
-        gold: Number(m.gold ?? m.Gold ?? 0),
-        silver: Number(m.silver ?? m.Silver ?? 0),
-        bronze: Number(m.bronze ?? m.Bronze ?? 0)
-      };
-    });
-    setMedals(medalSafe);
+      setLastUpdated(new Date());
+      setStatus("Live data from Google Sheets");
+    } catch (err) {
+      console.error(err);
+      setStatus("Failed to load live data");
+    } finally {
+      setLoading(false);
+    }
+  }, [selectedSport]);
 
-    setStatus("Live data from Google Sheets");
-  } catch (err) {
-    console.error(err);
-    setStatus("Failed to load live data");
-  } finally {
-    setLoading(false);
-  }
-}, [selectedSport]);
-
-
-  /* Fetch once per minute */
   useEffect(() => {
-  loadData();
-  const id = setInterval(loadData, 60000);
-  return () => clearInterval(id);
-}, [loadData]);
+    loadData();
+    const id = setInterval(loadData, 60000);
+    return () => clearInterval(id);
+  }, [loadData]);
 
-
-  /* ---------- SORTED MEDAL TABLE ---------- */
+  /* MEDAL SORTING */
   const overall = Object.entries(medals)
-    .map(([team, m]) => ({
-      team,
-      gold: m.gold,
-      silver: m.silver,
-      bronze: m.bronze,
-      total: m.gold + m.silver + m.bronze
-    }))
-    .sort((a, b) => {
-      if (medalSortBy === "gold")
-        return b.gold - a.gold || b.silver - a.silver || b.bronze - a.bronze;
-      if (medalSortBy === "silver")
-        return b.silver - a.silver || b.gold - a.gold || b.bronze - a.bronze;
-      if (medalSortBy === "bronze")
-        return b.bronze - a.bronze || b.gold - a.gold || b.silver - a.silver;
-      return b.total - a.total;
-    });
+  .map(([team, m]) => ({
+    team,
+    gold: m.gold,
+    silver: m.silver,
+    bronze: m.bronze,
+    total: m.gold + m.silver + m.bronze
+  }))
+  .sort((a, b) => b.total - a.total);
 
   return (
     <section className="wrap panel">
-      <h2>Standings & Results (Live)</h2>
+      <div style={{ display: "flex", justifyContent: "space-between" }}>
+        <h2>
+          Standings & Results
+          <span style={{ marginLeft: 10, color: "#ef4444", fontWeight: 700 }}>
+            ● LIVE
+          </span>
+        </h2>
+        <button className="btn ghost" onClick={loadData}>Refresh</button>
+      </div>
 
       <select
         className="sport-select"
@@ -402,92 +400,66 @@ function Standings() {
         {SPORTS.map(s => <option key={s}>{s}</option>)}
       </select>
 
-      {/* ---------- RESULTS ---------- */}
+      {/* MATCH RESULTS – CARD VIEW */}
       <div className="card mt">
         <h3>Match Results</h3>
         {loading ? "Loading…" : results.length === 0 ? (
-          <p className="muted">No results uploaded yet.</p>
+          <p className="muted">No results yet.</p>
         ) : (
-          <table className="table">
-            <thead>
-              <tr><th>Team A</th><th>Score</th><th>Team B</th></tr>
-            </thead>
-            <tbody>
-              {results.map((r, i) => (
-                <tr key={i}>
-                  <td className={r.ScoreA > r.ScoreB ? "winner" : "loser"}>{r.TeamA}</td>
-                  <td>{r.ScoreA} - {r.ScoreB}</td>
-                  <td className={r.ScoreB > r.ScoreA ? "winner" : "loser"}>{r.TeamB}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+          results.map((r, i) => (
+            <div key={i} className="card mt">
+              <div style={{ display: "flex", justifyContent: "space-between" }}>
+                <strong>{r.TeamA}</strong>
+                <strong>{r.ScoreA} - {r.ScoreB}</strong>
+                <strong>{r.TeamB}</strong>
+              </div>
+              <div className="small muted">
+                Status: <span className={`status ${r.Status?.toLowerCase() || "final"}`}>
+                  {r.Status || "FINAL"}
+                </span>
+              </div>
+            </div>
+          ))
         )}
       </div>
 
-      {/* ---------- STANDINGS ---------- */}
+      {/* STANDINGS */}
       <div className="card mt">
         <h3>Standings</h3>
         <table className="table">
           <thead>
-            <tr><th>Team</th><th>Played</th><th>Won</th><th>Lost</th><th>Points</th></tr>
+            <tr>
+              <th>#</th><th>Team</th><th>P</th><th>W</th><th>L</th><th>Pts</th>
+            </tr>
           </thead>
           <tbody>
-            {(teamsBySport[selectedSport] || []).length ? (
-              teamsBySport[selectedSport].map((t, i) => (
-                <tr key={i}>
-                  <td>{t.Team}</td>
-                  <td>{t.Played}</td>
-                  <td>{t.Won}</td>
-                  <td>{t.Lost}</td>
-                  <td>{t.Points}</td>
-                </tr>
-              ))
-            ) : (
-              <tr><td colSpan={5}>No data for this sport.</td></tr>
-            )}
-          </tbody>
-        </table>
-      </div>
-
-      {/* ---------- MEDALS ---------- */}
-      <div className="card mt">
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-          <h3>Overall Medals</h3>
-          <select
-            className="sport-select"
-            value={medalSortBy}
-            onChange={(e) => setMedalSortBy(e.target.value)}
-            style={{ maxWidth: 180 }}
-          >
-            <option value="gold">Sort by Gold 🥇</option>
-            <option value="silver">Sort by Silver 🥈</option>
-            <option value="bronze">Sort by Bronze 🥉</option>
-            <option value="total">Sort by Total 🧮</option>
-          </select>
-        </div>
-
-        <table className="table">
-          <thead>
-            <tr><th>Team</th><th>Gold</th><th>Silver</th><th>Bronze</th><th>Total</th></tr>
-          </thead>
-          <tbody>
-            {overall.length ? overall.map(o => (
-              <tr key={o.team}>
-                <td>{o.team}</td>
-                <td>{o.gold}</td>
-                <td>{o.silver}</td>
-                <td>{o.bronze}</td>
-                <td>{o.total}</td>
+            {(teamsBySport[selectedSport] || []).map((t, i) => (
+              <tr key={i} style={i === 0 ? { background: "rgba(34,197,94,0.1)", fontWeight: 700 } : {}}>
+                <td>{i + 1}</td>
+                <td>{t.Team}</td>
+                <td>{t.Played}</td>
+                <td>{t.Won}</td>
+                <td>{t.Lost}</td>
+                <td>{t.Points}</td>
               </tr>
-            )) : (
-              <tr><td colSpan={5}>No medals recorded yet.</td></tr>
-            )}
+            ))}
           </tbody>
         </table>
       </div>
 
-      <div className="small muted mt">{status}</div>
+      {/* MEDALS – PODIUM */}
+      <div className="card mt">
+        <h3>Top 3 Medals</h3>
+        {overall.slice(0, 3).map((o, i) => (
+          <div key={o.team} style={{ fontWeight: 700 }}>
+            {i === 0 && "🥇"} {i === 1 && "🥈"} {i === 2 && "🥉"} {o.team} — {o.total}
+          </div>
+        ))}
+      </div>
+
+      <div className="small muted mt">
+        {status} • Last updated: {lastUpdated?.toLocaleTimeString()}
+      </div>
     </section>
   );
 }
@@ -495,7 +467,8 @@ function Standings() {
 
 
 
-/* Gallery: carousel with 20 images */
+
+/* Gallery */
 
 function Gallery() {
   const [idx, setIdx] = useState(0);
@@ -526,7 +499,7 @@ function Gallery() {
   );
 }
 
-/* Contact: 6 committee members */
+/* Contact */
 function Contact() {
   const committee = [
     { name: "Ayush Kanojiya", role: "Sports Committee", phone: "+91-98765-43210", photo: COMMITTEE_IMAGES[0] },
