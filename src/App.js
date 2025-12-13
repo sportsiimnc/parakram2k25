@@ -11,7 +11,7 @@ const WEBAPP_URL =
 
 /* ---------- ASSETS / DATA ---------- */
 const LOGO_PATH = "/assets/Parakram_Logo.png";
-const HERO_IMG = "/assets/home-bg.png";
+const HERO_IMG = "/assets/home-bg.jpg";
 
 const SPORT_IMAGES = [
   "/assets/sports-cricket.jpg",
