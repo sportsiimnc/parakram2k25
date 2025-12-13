@@ -271,7 +271,7 @@ function Schedule() {
 
 
 function Register() {
-  const EMBED = "https://docs.google.com/forms/d/e/1FAIpQLSczbPmTZNPUPm0AKwPYCgnUHv8UiyPB9MPSBL8NXLl2qS3Cow/viewform?embedded=true";
+  const EMBED = "https://forms.gle/oHFEJ1Sv1zrA9AP76";
   return (
     <section className="wrap panel two-col">
       <div className="card">
