@@ -591,7 +591,7 @@ function Contact() {
     <section className="wrap panel two-col">
       <div>
         <h2>Contact Us</h2>
-        <p className="muted">Questions about registration, fixtures, or venues? Reach out.</p>
+        <p className="muted">Questions about registration, fixtures or venues? Reach out.</p>
 
         <form className="card form" onSubmit={submit}>
           <label>Name<input name="name" value={form.name} onChange={update} required/></label>
