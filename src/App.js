@@ -188,7 +188,7 @@ function NavLink({ to, children }) {
 function Footer() {
   return (
     <footer className="site-footer">
-      <div className="wrap small">© Parakram 2026 · Sports committee-IIM Lucknow NC </div>
+      <div className="wrap small">© Parakram 2026 · Sports committee-IIM Lucknow NC | © Developed by Bhawesh </div>
     </footer>
   );
 }
@@ -354,7 +354,7 @@ function Standings() {
       setMedals(medalSafe);
 
       setLastUpdated(new Date());
-      setStatus("Live data from Google Sheets");
+      setStatus("Live data");
     } catch (e) {
       console.error(e);
       setStatus("Failed to load data");
@@ -567,12 +567,12 @@ function Gallery() {
 /* Contact */
 function Contact() {
   const committee = [
-    { name: "Ayush Kanojiya", role: "Sports Committee", phone: "+91-98765-43210", photo: COMMITTEE_IMAGES[0] },
-    { name: "Karan Rajput", role: "Sports Committee", phone: "+91-91234-56789", photo: COMMITTEE_IMAGES[1] },
-    { name: "AAndu", role: "Logistics", phone: "+91-99887-77665", photo: COMMITTEE_IMAGES[2] },
-    { name: "Paaandu", role: "Media & PR", phone: "+91-90123-45678", photo: COMMITTEE_IMAGES[3] },
-    { name: "Gaandu", role: "Venue Coordinator", phone: "+91-90011-22334", photo: COMMITTEE_IMAGES[4] },
-    { name: "Santanu", role: "Volunteer Lead", phone: "+91-90022-33445", photo: COMMITTEE_IMAGES[5] },
+    { name: "Ayush Kanojiya", role: "Sports Committee - SM", phone: "+91-8439885496", photo: COMMITTEE_IMAGES[0] },
+    { name: "Karan Rajput", role: "Sports Committee - SM", phone: "+91-7016802451", photo: COMMITTEE_IMAGES[1] },
+    { name: "Shantanu", role: "Sports Committee - IPMX", phone: "+91-99887-77665", photo: COMMITTEE_IMAGES[2] },
+    { name: "Paaandu", role: "Sports Committee - IPMX", phone: "+91-90123-45678", photo: COMMITTEE_IMAGES[3] },
+    { name: "Gaandu", role: "Sports Committee - WE", phone: "+91-90011-22334", photo: COMMITTEE_IMAGES[4] },
+    { name: "Santanu", role: "Sports Committee - WE", phone: "+91-90022-33445", photo: COMMITTEE_IMAGES[5] },
   ];
 
   const [form, setForm] = useState({ name: "", email: "", message: "" });
