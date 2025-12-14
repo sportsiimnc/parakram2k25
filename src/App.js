@@ -283,7 +283,7 @@ function Register() {
     <section className="wrap panel two-col">
       <div className="card">
         <h2>Register</h2>
-        <p className="muted">Register via the official Google Form below.</p>
+        <p className="muted">Register via the official Google Form below or visit https://forms.gle/kKu9Y9biYtyepTUC6</p>
         <div className="embed-iframe">
           <iframe title="form" src={EMBED} width="100%" height="860" />
         </div>
@@ -291,10 +291,10 @@ function Register() {
 
       <div>
         <div className="card">
-          <h3>Event Pamphlet</h3>
+          <h3>Event Poster</h3>
           <img src={PAMPHLET_IMG} alt="pamphlet" className="pamphlet-img" onError={(e)=>e.target.src=PLACEHOLDER_SVG}/>
           <div style={{marginTop:12}}>
-            <a className="btn primary" href={PAMPHLET_FILE} download>Download Pamphlet</a>
+            <a className="btn primary" href={PAMPHLET_FILE} download>Download Poster</a>
           </div>
         </div>
       </div>
