@@ -163,8 +163,15 @@ function Header({ theme, setTheme }) {
         </div>
       </div>
 
-      <div className={`mobile-menu ${open ? "show" : ""}`}>
-        <nav className="mobile-nav">
+      <div
+  className={`mobile-menu ${open ? "show" : ""}`}
+  onClick={() => setOpen(false)}
+>
+  <nav
+    className="mobile-nav"
+    onClick={(e) => e.stopPropagation()}  // prevents close when clicking menu
+  >
+
           <Link to="/" onClick={() => setOpen(false)}>Home</Link>
           <Link to="/sports" onClick={() => setOpen(false)}>Sports</Link>
           <Link to="/schedule" onClick={() => setOpen(false)}>Schedule</Link>
@@ -172,9 +179,6 @@ function Header({ theme, setTheme }) {
           <Link to="/standings" onClick={() => setOpen(false)}>Standings</Link>
           <Link to="/gallery" onClick={() => setOpen(false)}>Gallery</Link>
           <Link to="/contact" onClick={() => setOpen(false)}>Contact</Link>
-          <div className="mobile-menu-footer">
-            <button className="btn primary" onClick={() => { setTheme((t) => (t === "dark" ? "light" : "dark")); }}>Toggle theme</button>
-          </div>
         </nav>
       </div>
     </header>
