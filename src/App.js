@@ -283,7 +283,17 @@ function Register() {
     <section className="wrap panel two-col">
       <div className="card">
         <h2>Register</h2>
-        <p className="muted">Register via the official Google Form below or visit https://forms.gle/kKu9Y9biYtyepTUC6</p>
+        <p className="muted">
+  Register via the official Google Form below or{" "}
+  <a
+    href="https://forms.gle/kKu9Y9biYtyepTUC6"
+    target="_blank"
+    rel="noopener noreferrer"
+  >
+    Open the form
+  </a>
+</p>
+
         <div className="embed-iframe">
           <iframe title="form" src={EMBED} width="100%" height="860" />
         </div>

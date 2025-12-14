@@ -295,3 +295,7 @@ html[data-theme="dark"] .hero-overlay {
     rgba(0, 0, 0, 0.45)
   );
 }
+.muted a {
+  color: #2563eb;
+  text-decoration: underline;
+}
