@@ -554,7 +554,7 @@ function Gallery() {
   return (
     <section className="wrap panel">
       <h2>Gallery</h2>
-      <p className="muted">Click arrows or wait for autoplay.</p>
+      <p className="muted"> </p>
 
       <div className="gallery-carousel card">
         <button className="gallery-nav left" onClick={prev} aria-label="Previous">‹</button>
