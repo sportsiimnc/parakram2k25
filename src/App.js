@@ -5,13 +5,37 @@ import "./index.css";
 /* ---------- CONFIG ---------- */
 const WEBAPP_URL =
   "https://script.google.com/macros/s/AKfycbwy0f2FLYxdPLQzwkNT_qGUEJ7IAKGtqPEhKK-jkhy3WLawIaCSRhTYBOJn2Fa6TDTz/exec";
-/* ----------------------------- */
 
+/* REGISTRATION DEADLINE */
+const REGISTRATION_DEADLINE = new Date("2026-01-15T23:59:59");
 
+/* GOOGLE FORMS */
+const FORMS = {
+  cricket: { team: "https://forms.gle/DJqJ9NkeB2Lp1Y6g8" },
+  football: { team: "https://forms.gle/LvyQw2ZgTTFtV6598" },
+  basketball: { team: "https://forms.gle/P8krKiWpHF5aBbB1A" },
+  volleyball: { team: "https://forms.gle/zftm8ecteN9642B99" },
+  tennis: { team: "https://forms.gle/EgMHk6HKftHrjgJa8" },
+  carrom: { team: "https://forms.gle/PpsrXL4jNbKSoCmg8" },
+
+  tabletennis: {
+    team: "https://forms.gle/yhNg3ia738C1Dibs7",
+    individual: "https://forms.gle/3bHKVTFrhuVsxhfd6",
+  },
+  badminton: {
+    team: "https://forms.gle/BLD8tQUvsTZuiEPf8",
+    individual: "https://forms.gle/2jBt3tvPGqVTBiHi6",
+  },
+
+  athletics: { individual: "https://forms.gle/JfqKJUSHT9Xg4CyZ7" },
+  pool: { individual: "https://forms.gle/2appdVDRZFmZ1sGu7" },
+  chess: { individual: "https://forms.gle/xS9cALrk1EGgxkoZ7" },
+};
 
 /* ---------- ASSETS ---------- */
 const LOGO_PATH = "/assets/Parakram_Logo.png";
 const HERO_IMG = "/assets/home-bg.png";
+const PAMPHLET_PDF = "/assets/OfficialPoster.pdf";
 
 const SPORT_IMAGES = [
   "/assets/sports-cricket.jpg",
@@ -19,11 +43,28 @@ const SPORT_IMAGES = [
   "/assets/sports-basketball.jpeg",
   "/assets/sports-volleyball.jpeg",
   "/assets/sports-tennis.jpeg",
+  "/assets/sports-carrom.jpg",
   "/assets/sports-tabletennis.jpeg",
+  "/assets/sports-badminton.jpeg",
   "/assets/sports-athletics.jpeg",
   "/assets/sports-pool.jpeg",
-  "/assets/sports-badminton.jpeg",
   "/assets/sports-chess.jpg",
+];
+
+const SPORTS = [
+  { name: "Cricket", type: "team" },
+  { name: "Football", type: "team" },
+  { name: "Basketball", type: "team" },
+  { name: "Volleyball", type: "team" },
+  { name: "Tennis", type: "team" },
+  { name: "Carrom", type: "team" },
+
+  { name: "Table Tennis", type: "both" },
+  { name: "Badminton", type: "both" },
+
+  { name: "Athletics", type: "individual" },
+  { name: "Pool", type: "individual" },
+  { name: "Chess", type: "individual" },
 ];
 
 const GALLERY_IMAGES = Array.from({ length: 20 }, (_, i) => `/assets/gallery-${i + 1}.jpg`);
@@ -37,60 +78,32 @@ const COMMITTEE_IMAGES = [
   "/assets/committee-6.jpg",
 ];
 
-const PAMPHLET_IMG = "/assets/pamphlet.jpg";
-const PAMPHLET_FILE = "/assets/pamphlet.pdf";
-
-const SPORTS = [
-  "Cricket",
-  "Football",
-  "Basketball",
-  "Volleyball",
-  "Tennis",
-  "Table Tennis",
-  "Athletics",
-  "Pool",
-  "Badminton",
-  "Chess",
-];
-
 const PLACEHOLDER_SVG = `data:image/svg+xml;utf8,${encodeURIComponent(
-  `<svg xmlns='http://www.w3.org/2000/svg' width='400' height='400'><rect width='100%' height='100%' fill='#e6eef8'/><text x='50%' y='55%' text-anchor='middle' fill='#94a3b8' font-size='20'>Image not found</text></svg>`
+  `<svg xmlns='http://www.w3.org/2000/svg' width='400' height='400'>
+    <rect width='100%' height='100%' fill='#e6eef8'/>
+    <text x='50%' y='55%' text-anchor='middle' fill='#94a3b8' font-size='20'>
+      Image not found
+    </text>
+  </svg>`
 )}`;
 
-/* ---------------------------------- */
-
-/* Theme helper */
+/* ---------- THEME ---------- */
 function getInitialTheme() {
   const saved = localStorage.getItem("parakram_theme");
   if (saved) return saved;
-  const prefersDark = window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches;
-  return prefersDark ? "dark" : "light";
+  return window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
 }
 
-/* AnimatedRoutes wrapper — fade/slide on route change */
+/* ---------- ROUTE WRAPPER ---------- */
 function AnimatedRoutes({ children }) {
   const location = useLocation();
-  const [displayLoc, setDisplayLoc] = useState(location);
-  const [stage, setStage] = useState("enter"); // 'enter' | 'exit'
-  useEffect(() => {
-    if (location.pathname === displayLoc.pathname) return;
-    setStage("exit");
-    const t = setTimeout(() => {
-      setDisplayLoc(location);
-      setStage("enter");
-    }, 220);
-    return () => clearTimeout(t);
-  }, [location, displayLoc]);
-  return (
-    <div className={`route-container route-${stage}`} key={displayLoc.key || displayLoc.pathname}>
-      <Routes location={displayLoc}>{children}</Routes>
-    </div>
-  );
+  return <Routes location={location}>{children}</Routes>;
 }
 
-/* -------- App root -------- */
+/* ---------- APP ---------- */
 export default function App() {
   const [theme, setTheme] = useState(getInitialTheme());
+
   useEffect(() => {
     document.documentElement.setAttribute("data-theme", theme);
     localStorage.setItem("parakram_theme", theme);
@@ -98,37 +111,25 @@ export default function App() {
 
   return (
     <Router>
-      <div className="app-root">
-        <Header theme={theme} setTheme={setTheme} />
-        <main className="main">
-          <AnimatedRoutes>
-            <Route path="/" element={<Home />} />
-            <Route path="/sports" element={<Sports />} />
-            <Route path="/schedule" element={<Schedule />} />
-            <Route path="/register" element={<Register />} />
-            <Route path="/standings" element={<Standings />} />
-            <Route path="/gallery" element={<Gallery />} />
-            <Route path="/contact" element={<Contact />} />
-            <Route path="*" element={<NotFound />} />
-          </AnimatedRoutes>
-        </main>
-        <Footer />
-      </div>
+      <Header theme={theme} setTheme={setTheme} />
+      <main className="main">
+        <AnimatedRoutes>
+          <Route path="/" element={<Home />} />
+          <Route path="/sports" element={<Sports />} />
+          <Route path="/poster" element={<OfficialPoster />} />
+          <Route path="/standings" element={<Standings />} />
+          <Route path="/gallery" element={<Gallery />} />
+          <Route path="/contact" element={<Contact />} />
+          <Route path="*" element={<NotFound />} />
+        </AnimatedRoutes>
+      </main>
+      <Footer />
     </Router>
   );
 }
 
-/* -------- Header / Mobile menu -------- */
+/* ---------- HEADER ---------- */
 function Header({ theme, setTheme }) {
-  const [open, setOpen] = useState(false); // mobile menu
-  useEffect(() => {
-    document.body.style.overflow = open ? "hidden" : "";
-  }, [open]);
-
-  function toggleTheme() {
-    setTheme((t) => (t === "dark" ? "light" : "dark"));
-  }
-
   return (
     <header className="site-header">
       <div className="wrap header-inner">
@@ -143,74 +144,37 @@ function Header({ theme, setTheme }) {
         <nav className="nav-desktop">
           <NavLink to="/">Home</NavLink>
           <NavLink to="/sports">Sports</NavLink>
-          <NavLink to="/schedule">Schedule</NavLink>
-          <NavLink to="/register">Register</NavLink>
+          <NavLink to="/poster">Official Poster</NavLink>
           <NavLink to="/standings">Standings</NavLink>
           <NavLink to="/gallery">Gallery</NavLink>
           <NavLink to="/contact">Contact</NavLink>
         </nav>
 
-        <div className="header-actions">
-          <button className="btn icon" aria-label="Toggle theme" onClick={toggleTheme}>
-            {theme === "dark" ? "🌙" : "☀️"}
-          </button>
-
-          <button className={`hamburger ${open ? "open" : ""}`} onClick={() => setOpen((s) => !s)} aria-label="Open menu">
-            <span />
-            <span />
-            <span />
-          </button>
-        </div>
-      </div>
-
-      <div
-  className={`mobile-menu ${open ? "show" : ""}`}
-  onClick={() => setOpen(false)}
->
-  <nav
-    className="mobile-nav"
-    onClick={(e) => e.stopPropagation()}  // prevents close when clicking menu
-  >
-
-          <Link to="/" onClick={() => setOpen(false)}>Home</Link>
-          <Link to="/sports" onClick={() => setOpen(false)}>Sports</Link>
-          <Link to="/schedule" onClick={() => setOpen(false)}>Schedule</Link>
-          <Link to="/register" onClick={() => setOpen(false)}>Register</Link>
-          <Link to="/standings" onClick={() => setOpen(false)}>Standings</Link>
-          <Link to="/gallery" onClick={() => setOpen(false)}>Gallery</Link>
-          <Link to="/contact" onClick={() => setOpen(false)}>Contact</Link>
-        </nav>
+        <button className="btn icon" onClick={() => setTheme(t => t === "dark" ? "light" : "dark")}>
+          {theme === "dark" ? "🌙" : "☀️"}
+        </button>
       </div>
     </header>
   );
 }
+
 function NavLink({ to, children }) {
   return <Link to={to} className="nav-link">{children}</Link>;
 }
 
-/* -------- Footer -------- */
-function Footer() {
-  return (
-    <footer className="site-footer">
-      <div className="wrap small">© Parakram 2026 · Sports committee-IIM Lucknow NC | © Developed by Bhawesh </div>
-    </footer>
-  );
-}
-
-
+/* ---------- HOME ---------- */
 function Home() {
   return (
     <section className="hero" style={{ backgroundImage: `url(${HERO_IMG})` }}>
       <div className="hero-overlay">
         <div className="wrap hero-inner">
           <h1 className="funky-title">PARAKRAM 2026</h1>
-          <p className="lead">Built on grit. Driven by passion. Defined by excellence.
-Every contest demands heart, hustle, and resilience.
-Win with pride. Compete with purpose.
-The game begins here.</p>
+          <p className="lead">
+            Built on grit. Driven by passion. Defined by excellence.
+          </p>
           <div className="cta-row">
-            <Link to="/register" className="btn primary">Register</Link>
-            <Link to="/schedule" className="btn ghost">View Schedule</Link>
+            <Link to="/sports" className="btn primary">Register</Link>
+            <Link to="/poster" className="btn ghost">Official Poster</Link>
           </div>
         </div>
       </div>
@@ -218,30 +182,48 @@ The game begins here.</p>
   );
 }
 
-
+/* ---------- SPORTS ---------- */
 function Sports() {
-  const fileName = (s) => s.toLowerCase().replace(/\s+/g, "-");
+  const closed = new Date() > REGISTRATION_DEADLINE;
+
+  const key = s => s.toLowerCase().replace(/\s+/g, "");
+
   return (
     <section className="wrap panel">
       <h2>Sports Lineup</h2>
-      <p className="muted"> Rules & Fixtures for each sport</p>
-      <div className="grid sports-grid">
+      <div className="sports-grid">
         {SPORTS.map((s, i) => {
-          const base = fileName(s);
-          const rules = `/assets/rules-${base}.pdf`;
-          const fixtures = `/assets/fixtures-${base}.pdf`;
+          const k = key(s.name);
+          const forms = FORMS[k] || {};
+
           return (
-            <article key={s} className="card sport-card">
+            <div key={s.name} className="card sport-card">
               <div className="sport-thumb" style={{ backgroundImage: `url(${SPORT_IMAGES[i]})` }} />
               <div className="card-body">
-                <h3>{s}</h3>
-                <p className="muted">Official documents for this sport.</p>
-                <div className="sport-downloads">
-                  <a className="btn primary" href={rules} download>Rules</a>
-                  <a className="btn ghost" href={fixtures} download>Fixtures</a>
-                </div>
+                <h3>{s.name}</h3>
+
+                <a className="btn ghost" href={`/assets/rules-${k}.pdf`} download>
+                  Rules
+                </a>
+
+                {!closed ? (
+                  <>
+                    {(s.type === "team" || s.type === "both") && (
+                      <a className="btn primary" href={forms.team} target="_blank" rel="noreferrer">
+                        Register Your Team
+                      </a>
+                    )}
+                    {(s.type === "individual" || s.type === "both") && (
+                      <a className="btn ghost" href={forms.individual} target="_blank" rel="noreferrer">
+                        Register Yourself
+                      </a>
+                    )}
+                  </>
+                ) : (
+                  <p className="muted">Registrations Closed</p>
+                )}
               </div>
-            </article>
+            </div>
           );
         })}
       </div>
@@ -249,74 +231,19 @@ function Sports() {
   );
 }
 
-
-function Schedule() {
+/* ---------- OFFICIAL POSTER ---------- */
+function OfficialPoster() {
   return (
     <section className="wrap panel">
-      <h2>Schedule</h2>
-      <p className="muted">Download and view the latest official upadtes</p>
-
-      <div className="card">
-        <a className="btn primary" href="/assets/Schedule.pdf" download>
-          Download Schedule
-        </a>
-
-        <div style={{ marginTop: 12 }}>
-          <object
-            data="/assets/Schedule.pdf"
-            width="100%"
-            height="640"
-            type="application/pdf"
-          >
-            PDF not supported — download instead.
-          </object>
-        </div>
-      </div>
+      <h2>Official Poster</h2>
+      <a className="btn primary" href={PAMPHLET_PDF} download>Download Poster</a>
+      <object data={PAMPHLET_PDF} width="100%" height="640" type="application/pdf" />
     </section>
   );
 }
-
-
-function Register() {
-  const EMBED = "https://forms.gle/oHFEJ1Sv1zrA9AP76";
-  return (
-    <section className="wrap panel two-col">
-      <div className="card">
-        <h2>Register</h2>
-        <p className="muted">
-  Register via the official Google Form below or{" "}
-  <a
-    href="https://forms.gle/kKu9Y9biYtyepTUC6"
-    target="_blank"
-    rel="noopener noreferrer"
-  >
-    Open the form
-  </a>
-</p>
-
-        <div className="embed-iframe">
-          <iframe title="form" src={EMBED} width="100%" height="860" />
-        </div>
-      </div>
-
-      <div>
-        <div className="card">
-          <h3>Event Poster</h3>
-          <img src={PAMPHLET_IMG} alt="pamphlet" className="pamphlet-img" onError={(e)=>e.target.src=PLACEHOLDER_SVG}/>
-          <div style={{marginTop:12}}>
-            <a className="btn primary" href={PAMPHLET_FILE} download>Download Poster</a>
-          </div>
-        </div>
-      </div>
-    </section>
-  );
-}
-
-
-
 
 function Standings() {
-  const [selectedSport, setSelectedSport] = useState(SPORTS[0]);
+  const [selectedSport, setSelectedSport] = useState(SPORTS[0].name);
   const [results, setResults] = useState([]);
   const [teamsBySport, setTeamsBySport] = useState({});
   const [medals, setMedals] = useState({});
@@ -341,19 +268,20 @@ function Standings() {
 
       /* STANDINGS */
       const grouped = {};
-      SPORTS.forEach(s => (grouped[s] = []));
+      SPORTS.forEach(s => (grouped[s.name] = []));
 
       (data.standings || []).forEach(row => {
-        SPORTS.forEach(sport => {
-          grouped[sport].push({
-            Team: row.Team,
-            Played: Number(row.P || 0),
-            Won: Number(row.W || 0),
-            Lost: Number(row.L || 0),
-            Points: Number(row.Pts || 0)
-          });
-        });
-      });
+  SPORTS.forEach(sport => {
+    grouped[sport.name].push({
+      Team: row.Team,
+      Played: Number(row.P || 0),
+      Won: Number(row.W || 0),
+      Lost: Number(row.L || 0),
+      Points: Number(row.Pts || 0)
+    });
+  });
+});
+
       setTeamsBySport(grouped);
 
       /* MEDALS */
@@ -409,12 +337,17 @@ function Standings() {
       </div>
 
       <select
-        className="sport-select"
-        value={selectedSport}
-        onChange={(e) => setSelectedSport(e.target.value)}
-      >
-        {SPORTS.map(s => <option key={s}>{s}</option>)}
-      </select>
+  className="sport-select"
+  value={selectedSport}
+  onChange={(e) => setSelectedSport(e.target.value)}
+>
+  {SPORTS.map(s => (
+    <option key={s.name} value={s.name}>
+      {s.name}
+    </option>
+  ))}
+</select>
+
 
       {/* MATCH RESULTS */}
       <div className="card mt">
@@ -547,8 +480,6 @@ function Standings() {
 
 
 
-/* Gallery */
-
 function Gallery() {
   const [idx, setIdx] = useState(0);
   const timerRef = useRef(null);
@@ -583,19 +514,18 @@ function Contact() {
   const committee = [
     { name: "Ayush Kanojiya", role: "Sports Committee - SM", phone: "+91-8439885496", photo: COMMITTEE_IMAGES[0] },
     { name: "Karan Rajput", role: "Sports Committee - SM", phone: "+91-7016802451", photo: COMMITTEE_IMAGES[1] },
-    { name: "Shantanu", role: "Sports Committee - IPMX", phone: "+91-99887-77665", photo: COMMITTEE_IMAGES[2] },
-    { name: "Paaandu", role: "Sports Committee - IPMX", phone: "+91-90123-45678", photo: COMMITTEE_IMAGES[3] },
-    { name: "Gaandu", role: "Sports Committee - WE", phone: "+91-90011-22334", photo: COMMITTEE_IMAGES[4] },
-    { name: "Santanu", role: "Sports Committee - WE", phone: "+91-90022-33445", photo: COMMITTEE_IMAGES[5] },
+    { name: "Santanu Sinha", role: "Sports Committee - IPMX", phone: "+91-8638650476", photo: COMMITTEE_IMAGES[2] },
+    { name: "Partha Sarathi", role: "Sports Committee - IPMX", phone: "+91-7008982243", photo: COMMITTEE_IMAGES[3] },
+    { name: "Ayush Raj", role: "Sports Committee - WE", phone: "+91-8527091834", photo: COMMITTEE_IMAGES[4] },
+    { name: "Sports Committee", role: "Sports Committee - WE", phone: "+91-90022-33445", photo: COMMITTEE_IMAGES[5] },
   ];
 
   const [form, setForm] = useState({ name: "", email: "", message: "" });
   function update(e) { setForm(f => ({ ...f, [e.target.name]: e.target.value })); }
-
   function submit(e) {
     e.preventDefault();
-    // Compose mailto to xyz@gmail.com with subject & body
-    const to = "xyz@gmail.com";
+    
+    const to = "sportsnc@iiml.ac.in";
     const subject = encodeURIComponent(`Parakram query from ${form.name || "Anonymous"}`);
     const body = encodeURIComponent(`Name: ${form.name}\nEmail: ${form.email}\n\nMessage:\n${form.message}`);
     window.location.href = `mailto:${to}?subject=${subject}&body=${body}`;
@@ -634,5 +564,17 @@ function Contact() {
   );
 }
 
-/* Not found */
-function NotFound(){ return (<section className="wrap panel"><h2>404</h2><p className="muted">Page not found — <Link to="/">home</Link>.</p></section>); }
+/* ---------- FOOTER ---------- */
+function Footer() {
+  return (
+    <footer className="site-footer">
+      <div className="wrap small">
+        © Parakram 2026 · Sports Committee IIM Lucknow NC | Developed by Bhawesh
+      </div>
+    </footer>
+  );
+}
+
+function NotFound() {
+  return <section className="wrap panel"><h2>404</h2></section>;
+}

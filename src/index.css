@@ -299,3 +299,19 @@ html[data-theme="dark"] .hero-overlay {
   color: #2563eb;
   text-decoration: underline;
 }
+.sports-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 18px;
+}
+
+.sports-grid .btn {
+  margin-top: 8px;
+  display: block;
+  text-align: center;
+}
+
+.btn[disabled] {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
