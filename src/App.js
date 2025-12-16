@@ -132,24 +132,28 @@ export default function App() {
 /* ---------- HEADER ---------- */
 function Header({ theme, setTheme }) {
   const [open, setOpen] = React.useState(false);
+  const location = useLocation();
 
   React.useEffect(() => {
     document.body.style.overflow = open ? "hidden" : "";
     return () => (document.body.style.overflow = "");
   }, [open]);
 
+  React.useEffect(() => {
+    setOpen(false); // 🔥 close menu on route change
+  }, [location.pathname]);
+
   return (
     <header className="site-header">
       <div className="wrap header-inner">
         <Link to="/" className="brand" onClick={() => setOpen(false)}>
-          <img src={LOGO_PATH} alt="logo" onError={(e) => (e.target.src = PLACEHOLDER_SVG)} />
+          <img src={LOGO_PATH} alt="logo" />
           <div className="brand-text">
             <div className="brand-title">Parakram 2026</div>
             <div className="brand-sub">Annual Sports Festival of IIML-NC</div>
           </div>
         </Link>
 
-        {/* Desktop nav */}
         <nav className="nav-desktop">
           <NavLink to="/">Home</NavLink>
           <NavLink to="/sports">Sports</NavLink>
@@ -159,20 +163,16 @@ function Header({ theme, setTheme }) {
           <NavLink to="/contact">Contact</NavLink>
         </nav>
 
-        {/* Actions */}
         <div className="header-actions">
           <button
             className="btn icon"
-            aria-label="Toggle theme"
             onClick={() => setTheme(t => (t === "dark" ? "light" : "dark"))}
           >
             {theme === "dark" ? "🌙" : "☀️"}
           </button>
 
-          {/* Hamburger / Close */}
           <button
             className={`hamburger ${open ? "open" : ""}`}
-            aria-label="Menu"
             onClick={() => setOpen(o => !o)}
           >
             <span />
@@ -182,13 +182,12 @@ function Header({ theme, setTheme }) {
         </div>
       </div>
 
-      {/* Mobile overlay */}
       <div
         className={`mobile-overlay ${open ? "show" : ""}`}
         onClick={() => setOpen(false)}
       >
         <nav
-          className={`mobile-menu ${open ? "show" : ""}`}
+          className="mobile-nav"
           onClick={(e) => e.stopPropagation()}
         >
           <NavLink to="/" onClick={() => setOpen(false)}>Home</NavLink>
@@ -202,6 +201,7 @@ function Header({ theme, setTheme }) {
     </header>
   );
 }
+
 
 
 function NavLink({ to, children }) {
