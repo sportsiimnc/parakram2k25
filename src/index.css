@@ -378,32 +378,50 @@ html[data-theme="dark"] .hero-overlay {
 
 
 /* Mobile menu */
+/* Mobile menu overlay */
 .mobile-menu {
-  position: fixed;          /* NOT absolute */
-  top: 0;
-  right: 0;
-  width: 80vw;              /* responsive */
-  max-width: 320px;
-  height: 100vh;
-  background: var(--bg);
-  padding: 24px;
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-  transform: translateX(100%);
-  transition: transform 0.3s ease;
-  z-index: 1000;
+  position: fixed;
+  top: 64px;              /* height of header */
+  left: 0;
+  width: 100%;
+  height: calc(100vh - 64px);
+  background: rgba(0,0,0,0.35);
+  z-index: 999;
+
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s ease;
 }
 
 .mobile-menu.show {
-  transform: translateX(0);
+  opacity: 1;
+  pointer-events: auto;
 }
 
+/* Dropdown list */
+.mobile-nav {
+  background: var(--bg);
+  display: flex;
+  flex-direction: column;
+  padding: 12px 16px;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.15);
+}
 
-.mobile-menu a {
-  font-size: 18px;
+/* Menu items */
+.mobile-nav a {
+  padding: 14px 8px;
+  font-size: 17px;
   font-weight: 600;
+  border-bottom: 1px solid rgba(0,0,0,0.08);
 }
+
+/* Hide desktop nav on mobile */
+@media (max-width: 768px) {
+  .nav-desktop {
+    display: none;
+  }
+}
+
 
 /* Responsive */
 @media (max-width: 768px) {
