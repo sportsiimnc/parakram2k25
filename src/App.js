@@ -68,7 +68,7 @@ const SPORTS = [
   { name: "Chess", type: "individual" },
 ];
 
-const GALLERY_IMAGES = Array.from({ length: 20 }, (_, i) => `/assets/gallery-${i + 1}.jpg`);
+const GALLERY_IMAGES = Array.from({ length: 20 }, (_, i) => `/assets/gallery-${i + 1}.jpeg`);
 
 const COMMITTEE_IMAGES = [
   "/assets/committee-1.jpg",
