@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useRef, useCallback } from "react";
 import { BrowserRouter as Router, Routes, Route, Link, useLocation } from "react-router-dom";
-import { Analytics } from "@vercel/analytics/react";
+//import { Analytics } from "@vercel/analytics/react";
 import "./index.css";
 
 /* ---------- CONFIG ---------- */
@@ -8,7 +8,7 @@ const WEBAPP_URL =
   "https://script.google.com/macros/s/AKfycbwy0f2FLYxdPLQzwkNT_qGUEJ7IAKGtqPEhKK-jkhy3WLawIaCSRhTYBOJn2Fa6TDTz/exec";
 
 /* REGISTRATION DEADLINE */
-const REGISTRATION_DEADLINE = new Date("2026-01-15T23:59:59");
+const REGISTRATION_DEADLINE = new Date("2025-12-20T11:59:59");
 
 /* GOOGLE FORMS */
 const FORMS = {
@@ -131,10 +131,17 @@ export default function App() {
 
 /* ---------- HEADER ---------- */
 function Header({ theme, setTheme }) {
+  const [open, setOpen] = React.useState(false);
+
+  React.useEffect(() => {
+    document.body.style.overflow = open ? "hidden" : "";
+    return () => (document.body.style.overflow = "");
+  }, [open]);
+
   return (
     <header className="site-header">
       <div className="wrap header-inner">
-        <Link to="/" className="brand">
+        <Link to="/" className="brand" onClick={() => setOpen(false)}>
           <img src={LOGO_PATH} alt="logo" onError={(e) => (e.target.src = PLACEHOLDER_SVG)} />
           <div className="brand-text">
             <div className="brand-title">Parakram 2026</div>
@@ -142,6 +149,7 @@ function Header({ theme, setTheme }) {
           </div>
         </Link>
 
+        {/* Desktop nav */}
         <nav className="nav-desktop">
           <NavLink to="/">Home</NavLink>
           <NavLink to="/sports">Sports</NavLink>
@@ -151,13 +159,50 @@ function Header({ theme, setTheme }) {
           <NavLink to="/contact">Contact</NavLink>
         </nav>
 
-        <button className="btn icon" onClick={() => setTheme(t => t === "dark" ? "light" : "dark")}>
-          {theme === "dark" ? "🌙" : "☀️"}
-        </button>
+        {/* Actions */}
+        <div className="header-actions">
+          <button
+            className="btn icon"
+            aria-label="Toggle theme"
+            onClick={() => setTheme(t => (t === "dark" ? "light" : "dark"))}
+          >
+            {theme === "dark" ? "🌙" : "☀️"}
+          </button>
+
+          {/* Hamburger / Close */}
+          <button
+            className={`hamburger ${open ? "open" : ""}`}
+            aria-label="Menu"
+            onClick={() => setOpen(o => !o)}
+          >
+            <span />
+            <span />
+            <span />
+          </button>
+        </div>
+      </div>
+
+      {/* Mobile overlay */}
+      <div
+        className={`mobile-overlay ${open ? "show" : ""}`}
+        onClick={() => setOpen(false)}
+      >
+        <nav
+          className={`mobile-menu ${open ? "show" : ""}`}
+          onClick={(e) => e.stopPropagation()}
+        >
+          <NavLink to="/" onClick={() => setOpen(false)}>Home</NavLink>
+          <NavLink to="/sports" onClick={() => setOpen(false)}>Sports</NavLink>
+          <NavLink to="/poster" onClick={() => setOpen(false)}>Official Poster</NavLink>
+          <NavLink to="/standings" onClick={() => setOpen(false)}>Standings</NavLink>
+          <NavLink to="/gallery" onClick={() => setOpen(false)}>Gallery</NavLink>
+          <NavLink to="/contact" onClick={() => setOpen(false)}>Contact</NavLink>
+        </nav>
       </div>
     </header>
   );
 }
+
 
 function NavLink({ to, children }) {
   return <Link to={to} className="nav-link">{children}</Link>;
