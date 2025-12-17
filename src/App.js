@@ -687,7 +687,7 @@ function Footer() {
   return (
     <footer className="site-footer">
       <div className="wrap small">
-        © Parakram 2026 · Sports Committee IIM Lucknow NC | Developed by Bhawesh
+        © Parakram 2026 · Sports Committee IIM Lucknow NC | Developed by Bhawesh - SM11
       </div>
     </footer>
   );
