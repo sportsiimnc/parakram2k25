@@ -8,7 +8,7 @@ const WEBAPP_URL =
   "https://script.google.com/macros/s/AKfycbwy0f2FLYxdPLQzwkNT_qGUEJ7IAKGtqPEhKK-jkhy3WLawIaCSRhTYBOJn2Fa6TDTz/exec";
 
 /* REGISTRATION DEADLINE */
-const REGISTRATION_DEADLINE = new Date("2025-12-20T11:59:59");
+const REGISTRATION_DEADLINE = new Date("2025-12-19T11:59:59");
 
 /* GOOGLE FORMS */
 const FORMS = {
@@ -101,6 +101,21 @@ function AnimatedRoutes({ children }) {
   return <Routes location={location}>{children}</Routes>;
 }
 
+function ScrollToTop() {
+  const { pathname } = useLocation();
+
+  React.useEffect(() => {
+    window.scrollTo({
+      top: 0,
+      behavior: "smooth",
+    });
+  }, [pathname]);
+
+  return null;
+}
+
+
+
 /* ---------- APP ---------- */
 export default function App() {
   const [theme, setTheme] = useState(getInitialTheme());
@@ -112,6 +127,7 @@ export default function App() {
 
   return (
     <Router>
+      <ScrollToTop />
       <Header theme={theme} setTheme={setTheme} />
       <main className="main">
         <AnimatedRoutes>
@@ -218,6 +234,9 @@ function Home() {
           <p className="lead">
             Built on grit. Driven by passion. Defined by excellence.
           </p>
+
+           <CountdownTimer />
+           
           <div className="cta-row">
             <Link to="/sports" className="btn primary">Register</Link>
             <Link to="/poster" className="btn ghost">Official Poster</Link>
@@ -227,6 +246,58 @@ function Home() {
     </section>
   );
 }
+
+function CountdownTimer() {
+  const [timeLeft, setTimeLeft] = React.useState(getTimeLeft());
+
+  function getTimeLeft() {
+    const now = new Date();
+    const diff = REGISTRATION_DEADLINE - now;
+
+    if (diff <= 0) {
+      return null;
+    }
+
+    return {
+      days: Math.floor(diff / (1000 * 60 * 60 * 24)),
+      hours: Math.floor((diff / (1000 * 60 * 60)) % 24),
+      minutes: Math.floor((diff / (1000 * 60)) % 60),
+      seconds: Math.floor((diff / 1000) % 60),
+    };
+  }
+
+  React.useEffect(() => {
+    const timer = setInterval(() => {
+      setTimeLeft(getTimeLeft());
+    }, 1000);
+
+    return () => clearInterval(timer);
+  }, []);
+
+  if (!timeLeft) {
+    return (
+      <div className="countdown closed">
+         Registrations Closed
+      </div>
+    );
+  }
+
+  return (
+  <div className="countdown-wrap">
+    <div className="countdown-label">
+    Registrations close in
+    </div>
+
+    <div className="countdown">
+      <strong>
+        {timeLeft.days}d {timeLeft.hours}h {timeLeft.minutes}m {timeLeft.seconds}s
+      </strong>
+    </div>
+  </div>
+);
+
+}
+
 
 /* ---------- SPORTS ---------- */
 function Sports() {
