@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useRef, useCallback } from "react";
 import { BrowserRouter as Router, Routes, Route, Link, useLocation } from "react-router-dom";
-//import { Analytics } from "@vercel/analytics/react";
+import { Analytics } from "@vercel/analytics/react";
 import "./index.css";
 
 /* ---------- CONFIG ---------- */
@@ -141,6 +141,7 @@ export default function App() {
         </AnimatedRoutes>
       </main>
       <Footer />
+      <Analytics />
     </Router>
   );
 }
