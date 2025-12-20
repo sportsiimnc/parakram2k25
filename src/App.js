@@ -8,7 +8,7 @@ const WEBAPP_URL =
   "https://script.google.com/macros/s/AKfycbwy0f2FLYxdPLQzwkNT_qGUEJ7IAKGtqPEhKK-jkhy3WLawIaCSRhTYBOJn2Fa6TDTz/exec";
 
 /* REGISTRATION DEADLINE */
-const REGISTRATION_DEADLINE = new Date("2025-12-20T11:59:59");
+const REGISTRATION_DEADLINE = new Date("2025-12-21T23:59:59");
 
 /* GOOGLE FORMS */
 const FORMS = {
