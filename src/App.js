@@ -2,10 +2,13 @@ import React, { useEffect, useState, useRef, useCallback } from "react";
 import { BrowserRouter as Router, Routes, Route, Link, useLocation } from "react-router-dom";
 import { Analytics } from "@vercel/analytics/react";
 import "./index.css";
+import Standings from "./Standings";
+
 
 /* ---------- CONFIG ---------- */
 const WEBAPP_URL =
-  "https://script.google.com/macros/s/AKfycbwy0f2FLYxdPLQzwkNT_qGUEJ7IAKGtqPEhKK-jkhy3WLawIaCSRhTYBOJn2Fa6TDTz/exec";
+  "https://script.google.com/macros/s/AKfycbxHZe8NSEMM4L2ZDaFRWiN0aUg1BW_ZWfQWU176H-iNvWgC7NsNcriwukeH2LqZCi08/exec";
+
 
 /* REGISTRATION DEADLINE */
 const REGISTRATION_DEADLINE = new Date("2025-12-21T23:59:59");
@@ -134,7 +137,11 @@ export default function App() {
           <Route path="/" element={<Home />} />
           <Route path="/sports" element={<Sports />} />
           <Route path="/poster" element={<OfficialPoster />} />
-          <Route path="/standings" element={<Standings />} />
+          <Route
+  path="/standings"
+  element={<Standings SPORTS={SPORTS} WEBAPP_URL={WEBAPP_URL} />}
+/>
+
           <Route path="/gallery" element={<Gallery />} />
           <Route path="/contact" element={<Contact />} />
           <Route path="*" element={<NotFound />} />
@@ -359,244 +366,6 @@ function OfficialPoster() {
     </section>
   );
 }
-
-function Standings() {
-  const [selectedSport, setSelectedSport] = useState(SPORTS[0].name);
-  const [results, setResults] = useState([]);
-  const [teamsBySport, setTeamsBySport] = useState({});
-  const [medals, setMedals] = useState({});
-  const [medalSortBy, setMedalSortBy] = useState("gold");
-  const [loading, setLoading] = useState(true);
-  const [status, setStatus] = useState("");
-  const [lastUpdated, setLastUpdated] = useState(null);
-
-  const normalizeSport = (s) => String(s || "").trim().toLowerCase();
-
-  const loadData = useCallback(async () => {
-    try {
-      setLoading(true);
-      const res = await fetch(WEBAPP_URL);
-      const data = await res.json();
-
-      /* RESULTS */
-      const filteredResults = (data.results || []).filter(
-        r => normalizeSport(r.Sport) === normalizeSport(selectedSport)
-      );
-      setResults(filteredResults);
-
-      /* STANDINGS */
-      const grouped = {};
-      SPORTS.forEach(s => (grouped[s.name] = []));
-
-      (data.standings || []).forEach(row => {
-  SPORTS.forEach(sport => {
-    grouped[sport.name].push({
-      Team: row.Team,
-      Played: Number(row.P || 0),
-      Won: Number(row.W || 0),
-      Lost: Number(row.L || 0),
-      Points: Number(row.Pts || 0)
-    });
-  });
-});
-
-      setTeamsBySport(grouped);
-
-      /* MEDALS */
-      const medalSafe = {};
-      Object.entries(data.medals || {}).forEach(([team, m]) => {
-        medalSafe[team] = {
-          gold: Number(m.gold ?? m.Gold ?? 0),
-          silver: Number(m.silver ?? m.Silver ?? 0),
-          bronze: Number(m.bronze ?? m.Bronze ?? 0)
-        };
-      });
-      setMedals(medalSafe);
-
-      setLastUpdated(new Date());
-      setStatus("Live data");
-    } catch (e) {
-      console.error(e);
-      setStatus("Failed to load data");
-    } finally {
-      setLoading(false);
-    }
-  }, [selectedSport]);
-
-  useEffect(() => {
-    loadData();
-    const id = setInterval(loadData, 60000);
-    return () => clearInterval(id);
-  }, [loadData]);
-
-  /* MEDAL SORTING */
-  const overall = Object.entries(medals)
-    .map(([team, m]) => ({
-      team,
-      gold: m.gold,
-      silver: m.silver,
-      bronze: m.bronze,
-      total: m.gold + m.silver + m.bronze
-    }))
-    .sort((a, b) =>
-      medalSortBy === "gold"
-        ? b.gold - a.gold || b.total - a.total
-        : b.total - a.total || b.gold - a.gold
-    );
-
-  return (
-    <section className="wrap panel">
-      <div style={{ display: "flex", justifyContent: "space-between" }}>
-        <h2>
-          Standings & Results
-          <span style={{ marginLeft: 10, color: "#ef4444", fontWeight: 700 }}>● LIVE</span>
-        </h2>
-        <button className="btn ghost" onClick={loadData}>Refresh</button>
-      </div>
-
-      <select
-  className="sport-select"
-  value={selectedSport}
-  onChange={(e) => setSelectedSport(e.target.value)}
->
-  {SPORTS.map(s => (
-    <option key={s.name} value={s.name}>
-      {s.name}
-    </option>
-  ))}
-</select>
-
-
-      {/* MATCH RESULTS */}
-      <div className="card mt">
-        <h3>Match Results</h3>
-
-        {loading ? (
-          "Loading…"
-        ) : results.length === 0 ? (
-          <p className="muted">No results yet.</p>
-        ) : (
-          results.map((r, i) => (
-            <div key={i} className="card mt">
-              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                <strong className={r.Winner === r.TeamA ? "winner" : ""}>
-                  {r.TeamA}
-                </strong>
-
-                <strong>
-                  {r.ScoreA} - {r.ScoreB}
-                </strong>
-
-                <strong className={r.Winner === r.TeamB ? "winner" : ""}>
-                  {r.TeamB}
-                </strong>
-              </div>
-
-              <div className="small muted" style={{ marginTop: 6 }}>
-                {r.Status === "LIVE" && (
-                  <span className="live-badge">● LIVE</span>
-                )}
-                {r.Winner && r.Winner !== "DRAW" && r.Status !== "LIVE" && (
-                  <span>
-                    Winner: <strong>{r.Winner}</strong>
-                  </span>
-                )}
-                {r.Winner === "DRAW" && <span>Match Drawn</span>}
-              </div>
-
-              {r.Date && (
-                <div className="small muted">📅 {r.Date}</div>
-              )}
-            </div>
-          ))
-        )}
-      </div>
-
-      {/* STANDINGS */}
-      <div className="card mt">
-        <h3>Standings</h3>
-        <table className="table">
-          <thead>
-            <tr>
-              <th style={{ width: "6%", textAlign: "center" }}>#</th>
-              <th style={{ width: "34%", textAlign: "left" }}>Team</th>
-              <th style={{ textAlign: "center" }}>P</th>
-              <th style={{ textAlign: "center" }}>W</th>
-              <th style={{ textAlign: "center" }}>L</th>
-              <th style={{ textAlign: "center" }}>Pts</th>
-            </tr>
-          </thead>
-          <tbody>
-            {(teamsBySport[selectedSport] || []).map((t, i) => (
-              <tr key={i} style={i === 0 ? { background: "rgba(34,197,94,0.12)", fontWeight: 700 } : {}}>
-                <td style={{ textAlign: "center" }}>{i + 1}</td>
-                <td style={{ textAlign: "left" }}>{t.Team}</td>
-                <td style={{ textAlign: "center" }}>{t.Played}</td>
-                <td style={{ textAlign: "center" }}>{t.Won}</td>
-                <td style={{ textAlign: "center" }}>{t.Lost}</td>
-                <td style={{ textAlign: "center" }}>{t.Points}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
-
-      {/* MEDALS */}
-      <div className="card mt">
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-          <h3>Overall Medals</h3>
-          <div>
-            <button
-              className={`btn ghost ${medalSortBy === "gold" ? "primary" : ""}`}
-              onClick={() => setMedalSortBy("gold")}
-            >
-              Sort by Gold
-            </button>
-            <button
-              className={`btn ghost ${medalSortBy === "total" ? "primary" : ""}`}
-              onClick={() => setMedalSortBy("total")}
-              style={{ marginLeft: 8 }}
-            >
-              Sort by Total
-            </button>
-          </div>
-        </div>
-
-        <table className="table mt">
-          <thead>
-            <tr>
-              <th style={{ width: "6%", textAlign: "center" }}>#</th>
-              <th style={{ width: "34%", textAlign: "left" }}>Team</th>
-              <th style={{ textAlign: "center" }}>🥇</th>
-              <th style={{ textAlign: "center" }}>🥈</th>
-              <th style={{ textAlign: "center" }}>🥉</th>
-              <th style={{ textAlign: "center" }}>Total</th>
-            </tr>
-          </thead>
-          <tbody>
-            {overall.map((o, i) => (
-              <tr key={o.team} style={i < 3 ? { fontWeight: 700 } : {}}>
-                <td style={{ textAlign: "center" }}>{i + 1}</td>
-                <td style={{ textAlign: "left" }}>{o.team}</td>
-                <td style={{ textAlign: "center" }}>{o.gold}</td>
-                <td style={{ textAlign: "center" }}>{o.silver}</td>
-                <td style={{ textAlign: "center" }}>{o.bronze}</td>
-                <td style={{ textAlign: "center" }}>{o.total}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
-
-      <div className="small muted mt">
-        {status} • Last updated: {lastUpdated?.toLocaleTimeString()}
-      </div>
-    </section>
-  );
-}
-
-
-
 
 function Gallery() {
   const [idx, setIdx] = useState(0);

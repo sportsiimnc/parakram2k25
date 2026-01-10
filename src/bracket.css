@@ -1,0 +1,49 @@
+.bracket {
+  display: flex;
+  gap: 48px;
+  overflow-x: auto;
+  padding: 20px;
+}
+
+.round {
+  min-width: 220px;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  position: relative;
+}
+
+.round-title {
+  font-weight: 700;
+  text-align: center;
+  margin-bottom: 8px;
+}
+
+.match {
+  background: #fff;
+  border-radius: 10px;
+  padding: 10px 14px;
+  box-shadow: 0 2px 8px rgba(0,0,0,.06);
+  position: relative;
+}
+
+.match div {
+  display: flex;
+  justify-content: space-between;
+  padding: 4px 0;
+}
+
+.match .winner {
+  color: #16a34a;
+  font-weight: 700;
+}
+
+.round:not(:last-child)::after {
+  content: "";
+  position: absolute;
+  right: -24px;
+  top: 50%;
+  width: 24px;
+  height: 2px;
+  background: #94a3b8;
+}
