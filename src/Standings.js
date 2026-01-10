@@ -20,6 +20,14 @@ const SPORT_FORMAT = {
   chess: "KNOCKOUT"
 };
 
+/* SPORTS THAT USE MATCH LIST (NOT BRACKET) */
+const KNOCKOUT_MATCH_LIST = [
+  "cricket",
+  "football",
+  "volleyball",
+  "basketball"
+];
+
 export default function Standings({ SPORTS, WEBAPP_URL }) {
   const [selectedSport, setSelectedSport] = useState(SPORTS[0].name);
   const [league, setLeague] = useState({});
@@ -34,7 +42,7 @@ export default function Standings({ SPORTS, WEBAPP_URL }) {
     const res = await fetch(WEBAPP_URL);
     const data = await res.json();
 
-    /* STANDINGS */
+    /* LEAGUE */
     const lg = {};
     (data.standings || []).forEach(r => {
       const k = normalize(r.Sport);
@@ -51,15 +59,15 @@ export default function Standings({ SPORTS, WEBAPP_URL }) {
       });
     });
 
-    /* KNOCKOUT / PLAYOFF MATCHES */
+    /* KNOCKOUT */
     const ko = {};
     (data.knockout || []).forEach(r => {
       const k = normalize(r.Sport);
       ko[k] ??= [];
       ko[k].push({
         Round: r.Round,
-        Team1: r["Team 1"],
-        Team2: r["Team 2"],
+        Team1: r["Team 1"] || "",
+        Team2: r["Team 2"] || "",
         Result: r.Result || ""
       });
     });
@@ -75,14 +83,14 @@ export default function Standings({ SPORTS, WEBAPP_URL }) {
   }, [loadData]);
 
   const sportKey = normalize(selectedSport);
-
-  /* SORT LEAGUE TABLE */
   const leagueTeams = (league[sportKey] || []).sort(
     (a, b) =>
       b.Points - a.Points ||
       b.Won - a.Won ||
       a.Lost - b.Lost
   );
+
+  const knockoutMatches = knockout[sportKey] || [];
 
   /* CRICKET GROUPS */
   const cricketGroups =
@@ -141,9 +149,9 @@ export default function Standings({ SPORTS, WEBAPP_URL }) {
           <thead>
             <tr>
               <th>Team</th>
-              <th>🥇</th>
-              <th>🥈</th>
-              <th>🥉</th>
+              <th>Gold</th>
+              <th>Silver</th>
+              <th>Bronze</th>
               <th>Total</th>
             </tr>
           </thead>
@@ -174,7 +182,7 @@ export default function Standings({ SPORTS, WEBAPP_URL }) {
 
       {loading && <p>Loading…</p>}
 
-      {/* LEAGUE TABLES */}
+      {/* LEAGUE TABLE */}
       {!loading && SPORT_FORMAT[sportKey] === "LEAGUE" && sportKey !== "cricket" && (
         leagueTeams.length ? (
           <LeagueTable teams={leagueTeams} />
@@ -183,7 +191,7 @@ export default function Standings({ SPORTS, WEBAPP_URL }) {
         )
       )}
 
-      {/* CRICKET GROUP TABLES */}
+      {/* CRICKET GROUPS */}
       {!loading && sportKey === "cricket" && cricketGroups && (
         <>
           <LeagueTable title="Group A" teams={cricketGroups.A} />
@@ -191,33 +199,52 @@ export default function Standings({ SPORTS, WEBAPP_URL }) {
         </>
       )}
 
-      {/* PLAYOFF / MATCHES FROM KNOCKOUT SHEET */}
-      {!loading && knockout[sportKey] && (
-  <div className="card mt">
-    <h3>{selectedSport} Matches</h3>
+      {/* KNOCKOUT MATCH LIST */}
+      {!loading && KNOCKOUT_MATCH_LIST.includes(sportKey) && (
+        <div className="card mt">
+          <h3>{selectedSport} – Knockout Matches</h3>
 
-    {knockout[sportKey].map((m, i) => (
-      <div key={i} className="playoff-card">
-        <div className="round">{m.Round}</div>
+          {knockoutMatches.length === 0 ? (
+            <p className="muted mt">Knockout stage not started yet</p>
+          ) : (
+            knockoutMatches.map((m, i) => {
+              const winner = m.Result || "";
 
-        <div className="match">
-          <span>{m.Team1}</span>
-          <span className="vs">vs</span>
-          <span>{m.Team2}</span>
+              return (
+                <div
+                  key={i}
+                  className={`ko-match ${winner ? "completed" : ""}`}
+                >
+                  <div className="ko-round">{m.Round}</div>
+
+                  <div className="ko-teams">
+                    <div className={`team ${winner === m.Team1 ? "winner" : ""}`}>
+                      {m.Team1 || "TBD"}
+                    </div>
+
+                    <div className="vs">vs</div>
+
+                    <div className={`team ${winner === m.Team2 ? "winner" : ""}`}>
+                      {m.Team2 || "TBD"}
+                    </div>
+                  </div>
+
+                  <div className="ko-result">
+                    {winner ? `Winner: ${winner}` : "Result: —"}
+                  </div>
+                </div>
+              );
+            })
+          )}
         </div>
-
-        <div className="result muted">
-          {m.Result || "Result: —"}
-        </div>
-      </div>
-    ))}
-  </div>
-)}
-
-      {/* PURE KNOCKOUT SPORTS */}
-      {!loading && SPORT_FORMAT[sportKey] === "KNOCKOUT" && (
-        <KnockoutBracket matches={knockout[sportKey] || []} />
       )}
+
+      {/* BRACKET (PURE KNOCKOUT SPORTS) */}
+      {!loading &&
+        SPORT_FORMAT[sportKey] === "KNOCKOUT" &&
+        !KNOCKOUT_MATCH_LIST.includes(sportKey) && (
+          <KnockoutBracket matches={knockoutMatches} />
+        )}
     </section>
   );
 }

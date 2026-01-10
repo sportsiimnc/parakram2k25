@@ -7,7 +7,7 @@ import Standings from "./Standings";
 
 /* ---------- CONFIG ---------- */
 const WEBAPP_URL =
-  "https://script.google.com/macros/s/AKfycbxHZe8NSEMM4L2ZDaFRWiN0aUg1BW_ZWfQWU176H-iNvWgC7NsNcriwukeH2LqZCi08/exec";
+  "https://script.google.com/macros/s/AKfycbymJXRm5A4rc55Pu53-IaF6kstOUq0zdDuB81MCJZYoZ-wGAI9Sea-S26ux1_784H8T/exec";
 
 
 /* REGISTRATION DEADLINE */
