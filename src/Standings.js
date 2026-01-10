@@ -192,27 +192,27 @@ export default function Standings({ SPORTS, WEBAPP_URL }) {
       )}
 
       {/* PLAYOFF / MATCHES FROM KNOCKOUT SHEET */}
-      {!loading &&
-        Array.isArray(knockout[sportKey]) &&
-        knockout[sportKey].length > 0 && (
-          <div className="card mt">
-            <h3>{selectedSport} Matches</h3>
+      {!loading && knockout[sportKey] && (
+  <div className="card mt">
+    <h3>{selectedSport} Matches</h3>
 
-            {knockout[sportKey].map((m, i) => (
-              <div key={i} className="playoff-card">
-                <div className="round">{m.Round}</div>
-                <div className="match">
-                  <span>{m.Team1}</span>
-                  <span className="vs">vs</span>
-                  <span>{m.Team2}</span>
-                </div>
-                <div className="result muted">
-                  {m.Result || "Result: —"}
-                </div>
-              </div>
-            ))}
-          </div>
-        )}
+    {knockout[sportKey].map((m, i) => (
+      <div key={i} className="playoff-card">
+        <div className="round">{m.Round}</div>
+
+        <div className="match">
+          <span>{m.Team1}</span>
+          <span className="vs">vs</span>
+          <span>{m.Team2}</span>
+        </div>
+
+        <div className="result muted">
+          {m.Result || "Result: —"}
+        </div>
+      </div>
+    ))}
+  </div>
+)}
 
       {/* PURE KNOCKOUT SPORTS */}
       {!loading && SPORT_FORMAT[sportKey] === "KNOCKOUT" && (
